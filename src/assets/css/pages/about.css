@@ -1,0 +1,16 @@
+.about {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.about .title {
+    margin-bottom: 30px;
+}
+
+.about .title h1 {
+    font-size: 30px;
+}
+
+.about .title p {
+    margin: 10px 0;
+}

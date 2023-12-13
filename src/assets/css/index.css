@@ -1,0 +1,112 @@
+/*  Basics */
+@import "basics/base.css";
+@import "basics/helpers.css";
+@import "basics/layout.css";
+@import "basics/animations.css";
+
+/* Pages */
+@import "./pages/home.css";
+@import "./pages/about.css";
+@import "./pages/email.css";
+
+/* Components */
+@import "./cmps/app-header.css";
+@import "./cmps/app-footer.css";
+
+/* palette */
+:root {
+    --palette1: #001d35;
+    --palette2: #f0f4f9;
+    --palette3: #d3e3fd;
+    --palette4: #c2e7ff;
+    --palette5: #e9eef6;
+    --palette6: #2021240f;
+    --palette7: #e1e3e1;
+    --palette8: #f2f6fc;
+    --palette9: #ffffff;
+    --palette10: #f7ca4c;
+    --palette11: #dd4b39;
+    
+
+    --background: var(--palette2);
+    --text: var(--palette1);
+    --disabled-text: var(--palette7);
+    --draft-text: var(--palette11);
+    --header-background: var(--palette3);
+    --header-text: var(--palette9);
+    --header-text-hover: var(--palette1);
+    --footer-background: var(--palette3);
+    --footer-text: var(--palette9);
+    --email-folder-list-item-divider: var(--palette7);
+    --email-folder-list-item-backgroud-hover: var(--palette6);
+    --email-folder-list-item-backgroud-selected: var(--palette5);
+    --email-folder-list-compose-backgroud: var(--palette4);
+    --email-search-backgroud: var(--palette5);
+    --email-filter-backgroud: var(--palette9);
+    --email-filter-border: var(--palette7);
+    --email-filter-read-border: var(--palette7);
+    --email-filter-read-background-selected: var(--palette7);
+    --email-filter-read-background-hover: var(--palette7);
+    --email-preview-backgroud: var(--palette8);
+    --email-preview-backgroud-unread: var(--palette9);
+    --email-preview-starred: var(--palette10);
+    --email-details-backgound: var(--palette9);
+    --email-list-icon-backgroud-hover: var(--palette6);
+
+
+    /**/
+    --gm3-sys-color-background: #fff;
+    --gm3-sys-color-error: #b3261e;
+    --gm3-sys-color-error-container: #f9dedc;
+    --gm3-sys-color-inverse-on-surface: #f2f2f2;
+    --gm3-sys-color-inverse-primary: #a8c7fa;
+    --gm3-sys-color-inverse-surface: #303030;
+    --gm3-sys-color-on-background: #1f1f1f;
+    --gm3-sys-color-on-error: #fff;
+    --gm3-sys-color-on-error-container: #410e0b;
+    --gm3-sys-color-on-primary: #fff;
+    --gm3-sys-color-on-primary-container: #041e49;
+    --gm3-sys-color-on-primary-fixed: #041e49;
+    --gm3-sys-color-on-primary-fixed-variant: #0842a0;
+    --gm3-sys-color-on-secondary: #fff;
+    --gm3-sys-color-on-secondary-container: #001d35;
+    --gm3-sys-color-on-secondary-fixed: #001d35;
+    --gm3-sys-color-on-secondary-fixed-variant: #004a77;
+    --gm3-sys-color-on-surface: #1f1f1f;
+    --gm3-sys-color-on-surface-variant: #444746;
+    --gm3-sys-color-on-tertiary: #fff;
+    --gm3-sys-color-on-tertiary-container: #072711;
+    --gm3-sys-color-on-tertiary-fixed: #072711;
+    --gm3-sys-color-on-tertiary-fixed-variant: #0f5223;
+    --gm3-sys-color-outline: #747775;
+    --gm3-sys-color-outline-variant: #c4c7c5;
+    --gm3-sys-color-primary: #0b57d0;
+    --gm3-sys-color-primary-container: #d3e3fd;
+    --gm3-sys-color-primary-fixed: #d3e3fd;
+    --gm3-sys-color-primary-fixed-dim: #a8c7fa;
+    --gm3-sys-color-scrim: #000;
+    --gm3-sys-color-secondary: #00639b;
+    --gm3-sys-color-secondary-container: #c2e7ff;
+    --gm3-sys-color-secondary-fixed: #c2e7ff;
+    --gm3-sys-color-secondary-fixed-dim: #7fcfff;
+    --gm3-sys-color-shadow: #000;
+    --gm3-sys-color-surface: #fff;
+    --gm3-sys-color-surface-bright: #fff;
+    --gm3-sys-color-surface-container: #f0f4f9;
+    --gm3-sys-color-surface-container-high: #e9eef6;
+    --gm3-sys-color-surface-container-highest: #dde3ea;
+    --gm3-sys-color-surface-container-low: #f8fafd;
+    --gm3-sys-color-surface-container-lowest: #fff;
+    --gm3-sys-color-surface-dim: #d3dbe5;
+    --gm3-sys-color-surface-tint: #6991d6;
+    --gm3-sys-color-surface-variant: #e1e3e1;
+    --gm3-sys-color-tertiary: #146c2e;
+    --gm3-sys-color-tertiary-container: #c4eed0;
+    --gm3-sys-color-tertiary-fixed: #c4eed0;
+    --gm3-sys-color-tertiary-fixed-dim: #6dd58c;
+
+}
+
+
+
+

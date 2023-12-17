@@ -1,4 +1,5 @@
 
+
 export const utilService = {
     makeId,
     saveToStorage,
@@ -6,7 +7,9 @@ export const utilService = {
     formatListDate,
     formatDetailsDate,
     areObjectsEqual,
-    hasValidEmail
+    hasValidEmail,
+    isMobile,
+    getDummyColor
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -96,7 +99,23 @@ function areObjectsEqual(obj1, obj2) {
 }
 
 function hasValidEmail(emailsList) {
+    if (!emailsList) {
+        return false;
+    }
+
     const emails = emailsList.split(';').map(email => email.trim());
     const isValidEmail = emails.some(email => EMAIL_REGEX.test(email));
     return isValidEmail;
 }
+
+function isMobile() {
+    return window.innerWidth <= 991;
+}
+
+function getDummyColor() {
+    const randomComponent = () => Math.floor(Math.random() * 128);
+    const red = randomComponent();
+    const green = randomComponent();
+    const blue = randomComponent();
+    return `rgb(${red},${green},${blue})`;
+};

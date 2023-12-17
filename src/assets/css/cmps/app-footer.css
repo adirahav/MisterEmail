@@ -2,4 +2,7 @@ footer {
     background: var(--footer-background);
     color: var(--footer-text);
     text-align: center;
+    height: 40px;
+    align-items: center;
+    display: grid;
 }

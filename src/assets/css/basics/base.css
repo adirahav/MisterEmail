@@ -8,6 +8,7 @@ html {
     scroll-behavior: smooth;
     background-color: var(--background);
     color: var(--text);
+    overflow-y: hidden;
 }
 
 body {
@@ -17,6 +18,7 @@ body {
         "Droid Sans", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-y: hidden;
 }
 
 img {
@@ -80,19 +82,118 @@ input {
     -webkit-border-radius: 100px;
 }
 
-.main-app {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+@media screen and (max-width: 991px) { /* mobile */
+    html {
+        font-size: 14px;
+        background-color: var(--mobile-background);
+    }
 }
 
+.main-app {
+    display: grid;
+    grid-template-columns: 1fr;		
+    grid-template-rows: auto 1fr auto;
+    gap: 0;
+    grid-template-areas:
+        "h"
+        "m"
+        "f";
+}
+
+.main-app.has-aside {
+    grid-template-columns: 256px 1fr;		
+    grid-template-areas:
+        "a m"
+}
+
+.main-app header {
+    grid-area: h;
+}   
+
+.main-app aside {
+    grid-area: a;
+}   
 
 .main-app main {
-    flex-grow: 1;
-    width: 100%;
+    grid-area: m;
+}
+
+.main-app.aside {
+    width: 256px
+}
+
+.main-app footer {
+    grid-area: f;
+}
+
+@media screen and (max-width: 991px) { /* mobile */
+    .main-app.has-aside {
+        grid-template-columns: 1fr;		
+        grid-template-areas:
+            "m"
+    }
 }
 
 a.active {
     color: rgb(84, 17, 147);
     font-weight: 600;
+}
+
+.hide-content {
+    visibility: hidden;
+}
+
+/******************************/
+/* screen sizes               */
+/******************************/
+
+@media screen and (min-width: 992px) { /* web */
+    .mobile {
+        display: none!important;
+    }
+}
+
+@media screen and (max-width: 991px) { /* mobile */
+    .web {
+        display: none!important;
+    }
+}
+
+/* ============================ */
+/* overlay                      */
+/* ============================ */
+@media screen and (max-width: 991px) {  /* -- mobile -- */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-width: 100%; 
+        height: 100%;
+        background: var(--mobile-overlay-background); 
+        opacity: 0.7;
+        z-index: 1000; 
+    }
+}
+
+/* ============================ */
+/* animations                   */
+/* ============================ */
+
+@keyframes slide-from-left {
+    from {
+        transform: translateX(-70%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slide-to-left {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-70%);
+    }
 }

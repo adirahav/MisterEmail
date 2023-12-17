@@ -122,10 +122,10 @@ async function query(filterBy, sortBy) {
     return {
         list: emails,
         newInboxCount: _inboxEmails.filter(email => email.isRead === false).length,
-        starredCount: _starredEmails.length,
-        sentCount: _sentEmails.length,
+        starredCount: 0,
+        sentCount: 0,
         draftCount: _draftEmails.length,
-        trashCount: _deletedEmails.length,
+        trashCount: 0,
     }
 }
 

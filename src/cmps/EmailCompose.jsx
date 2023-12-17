@@ -2,21 +2,35 @@ import React from 'react'
 import { useState, useEffect, useRef } from "react";
 import { utilService } from '../services/util.service';
 
-export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDelete }) {
-    const [recipients, setRecipients] = useState('');
-    const [subject, setSubject] = useState('');
-    const [body, setBody] = useState('');
-    const [draftEmail, setDraftEmail] = useState(newDraftEmail);
+export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDelete }) {
+    const [header, setHeader] = useState(composedEmail && composedEmail.subject ? composedEmail.subject : "New Message")
+    const [recipients, setRecipients] = useState(composedEmail ? composedEmail.to : '');
+    const [subject, setSubject] = useState(composedEmail ? composedEmail.subject : '');
+    const [body, setBody] = useState(composedEmail ? composedEmail.body : '');
+    const [draftEmail, setDraftEmail] = useState(composedEmail);
     const [lastDraftEmail, setLastDraftEmail] = useState(null);
     const [autoSaveInterval, setAutoSaveInterval] = useState(null);
+    const [resize, setResize] = useState('maximize');
+    const [fullscreen, setFullscreen] = useState('not-fullscreen');
     
     const AUTO_SAVE_TIME = 5 * 1000;    // 5 seconds in milliseconds
 
     // new draft email
     useEffect(() => {
-        setDraftEmail(prevDraftEmail => ({ ...prevDraftEmail, ...newDraftEmail }))
-        setLastDraftEmail(newDraftEmail);
-    }, [newDraftEmail]);
+        setDraftEmail((prevDraftEmail) => {
+            if (prevDraftEmail.id !== composedEmail.id) {
+                setHeader(composedEmail.subject === "" ? "New Message" : composedEmail.subject)
+                setRecipients(composedEmail.recipients);
+                setSubject(composedEmail.subject);
+                setBody(composedEmail.body);
+            }
+
+            return { ...prevDraftEmail, ...composedEmail }; 
+        });
+
+        //setDraftEmail(prevDraftEmail => ({ ...prevDraftEmail, ...composedEmail }))
+        setLastDraftEmail(composedEmail);
+    }, [composedEmail]);
 
     // field change action
     const handleFieldChanged = (ev) => {
@@ -43,7 +57,6 @@ export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDel
             return updatedDraft;
         });
     };
-    
 
     // auto save
     useEffect(() => {
@@ -57,9 +70,13 @@ export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDel
         const intervalId = setInterval(() => {
             setDraftEmail((prevDraftEmail) => {
                 setLastDraftEmail((prevLastDraftEmail) => {
-                    if (prevDraftEmail != null && prevDraftEmail != undefined) {
+                    if (prevDraftEmail !== null && prevDraftEmail !== undefined) {
                         if (!utilService.areObjectsEqual(prevDraftEmail, prevLastDraftEmail)) {
                             onAutoSave(prevDraftEmail);
+                            setHeader("Draft saved");
+                            setTimeout(() => {
+                                setHeader(prevDraftEmail.subject);
+                            }, 5000);
                             return prevDraftEmail; // return the changed state: setLastDraftEmail(prevDraftEmail)
                         }
                     }
@@ -108,14 +125,47 @@ export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDel
         onClose();
     };
 
+    // resize
+    function windowResize() {
+        setResize((prevResize) => {
+            return prevResize == "minimize"
+                    ? "maximize" 
+                    : "minimize";
+        }); 
+    }
+
+    const resizeClass = `fa-solid fa-window-${resize == 'minimize' ? 'maximize' : 'minimize'} fa-xs`;
+
+    // fullscreen
+    function windowFullscreen() {
+        setFullscreen((prevFullscreen) => {
+            if (prevFullscreen == "fullscreen") {
+                return "not-fullscreen";
+            }
+            else {
+                setResize("maximize");
+                return "fullscreen";
+            }
+        }); 
+    }
+
+    const fullscreenClass = `fa-solid ${fullscreen == 'fullscreen' ?  'fa-solid fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} fa-xs`;
+
     return (
-        <article className="email-compose">
-            <header>
-                <h2>New Message</h2>
+        <article className={`email-compose ${resize} ${fullscreen}`}>
+            <header className="web">
+                <h2>{header}</h2>
                 <div>
-                    <i className="fa-solid fa-window-minimize fa-xs"></i>
-                    <i className="fa-solid fa-up-right-and-down-left-from-center fa-xs"></i>
+                    <i className={resizeClass} onClick={windowResize}></i>
+                    <i className={fullscreenClass} onClick={windowFullscreen}></i>
                     <i className="fa-solid fa-xmark" onClick={onClose}></i>
+                </div>
+            </header>
+            <header className="mobile">
+                <h2><i className="fa-solid fa-arrow-left" onClick={onClose}></i></h2>
+                <div>
+                    <i className="fa-regular fa-paper-plane" onClick={handleSend}></i>
+                    <i className="fa-regular fa-trash-can" onClick={handleOnDelete}></i>
                 </div>
             </header>
             <div className="new-message">
@@ -123,7 +173,7 @@ export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDel
                     <input
                         type="text"
                         placeholder="Recipients"
-                        value={recipients}
+                        value={recipients ?? ''}
                         id="recipients"
                         name="recipients"
                         onChange={handleFieldChanged}
@@ -133,7 +183,7 @@ export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDel
                     <input
                         type="text"
                         placeholder="Subject"
-                        value={subject}
+                        value={subject ?? ''}
                         id="subject"
                         name="subject"
                         onChange={handleFieldChanged}
@@ -142,7 +192,7 @@ export function EmailCompose({ newDraftEmail, onClose, onAutoSave, onSend, onDel
                 <textarea className='body' 
                         id="body"
                         name="body"
-                        value={body}
+                        value={body ?? ''}
                         onChange={handleFieldChanged} />
                 <div className='actions'>
                     <button className='send' onClick={handleSend}>Send</button>

@@ -1,11 +1,12 @@
 import { utilService } from "../services/util.service";
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 export function EmailDetails({email, onDelete}) {
-    function onBackPress() {
-        const navigate = useNavigate();
-        navigate(`/email`);
-    }
+    const navigate = useNavigate();
+
+    const handleBackPress = () => {
+        navigate(-1); 
+    };
 
     function handleDelete() {
         onDelete(email, true);
@@ -14,7 +15,7 @@ export function EmailDetails({email, onDelete}) {
     return (
         <section className="email-details">
             <article className="actions">
-                <i className="fa-solid fa-arrow-left" onClick={onBackPress}></i>
+                <i className="fa-solid fa-arrow-left" onClick={handleBackPress}></i>
                 <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
             </article>
             <article className="subject"><h2>{email.subject}</h2></article>

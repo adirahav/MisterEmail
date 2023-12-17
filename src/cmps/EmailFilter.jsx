@@ -1,24 +1,34 @@
 import React from 'react'
 import { useEffect, useState } from "react";
+import { utilService } from '../services/util.service';
+import { emailService } from '../services/email.service';
 
-export function EmailFilter({displaySort, filterBy, onSetFilter, sortBy, onSetSort }) {
+export function EmailFilter({displaySort, filterBy, onSetFilter, sortBy, onSetSort, onToggleFolderList }) {
     const [filter, setFilterBy] = useState(filterBy)
     const [sort, setSortBy] = useState(filterBy)
     const [displayRead, setDisplayRead] = useState('none')
+
+    function handleSearchChange(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        let { value } = ev.target;     
+        setFilterBy((prevFilter) => ({ ...prevFilter, txt: value }));
+    }
 
     function handleFilterChange(ev) {
         ev.preventDefault();
         ev.stopPropagation();
 
-        let { readField, name, value } = ev.target.dataset || ev.target;
+        let { readField, id, value } = ev.target.dataset;
       
-        if (name) {
-          if (name === 'subject') {
-            name = "txt";
+        if (id) {
+          if (id === 'subject') {
+            id = "txt";
           }
         } 
         else {
-            name = "read";
+            id = "read";
       
             value = readField !== 'null' 
                     ? readField === 'true' 
@@ -27,8 +37,8 @@ export function EmailFilter({displaySort, filterBy, onSetFilter, sortBy, onSetSo
             setDisplayRead("none");
         }
 
-        setFilterBy((prevFilter) => ({ ...prevFilter, [name]: value }));
-      }
+        setFilterBy((prevFilter) => ({ ...prevFilter, [id]: value }));
+    }
       
 
     function handleSortBy(ev) {
@@ -73,11 +83,16 @@ export function EmailFilter({displaySort, filterBy, onSetFilter, sortBy, onSetSo
     const readFilterRead = filterBy.read === true ? "selected" : ""; 
     const readFilterUnread = filterBy.read === false ? "selected" : ""; 
 
+    const avatar = emailService.loggedinUser.email.charAt(0).toUpperCase();
+    const avatarColor = utilService.getDummyColor();
+
     return (
         <article className="email-filter">
             <form>
-                <i className="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search" onChange={handleFilterChange} id="subject" value={txt} name="subject" />
+                <i className="fa-solid fa-magnifying-glass web"></i>
+                <i className="fa-solid fa-bars mobile" onClick={onToggleFolderList}></i>
+                <input type="text" placeholder="Search" onChange={handleSearchChange} id="search" value={txt} name="subject" />
+                <span className="avatar mobile" style={{ background: avatarColor }}>{avatar}</span>
             </form>
             {displaySort && <ul>
                 <li className={dateSortLI} onClick={handleSortBy} data-sort-field="sentAt"><i className={dateSortIcon}></i>Date</li>

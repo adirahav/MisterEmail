@@ -13,98 +13,74 @@
 @import "./cmps/app-header.css";
 @import "./cmps/app-footer.css";
 
-/* palette */
+
 :root {
+    /* palette */
     --palette1: #001d35;
-    --palette2: #f0f4f9;
-    --palette3: #d3e3fd;
-    --palette4: #c2e7ff;
-    --palette5: #e9eef6;
-    --palette6: #2021240f;
-    --palette7: #e1e3e1;
-    --palette8: #f2f6fc;
-    --palette9: #ffffff;
-    --palette10: #f7ca4c;
-    --palette11: #dd4b39;
-    
+    --palette2: #1f1f1f;
+    --palette3: #f0f4f9;
+    --palette4: #d3e3fd;
+    --palette5: #c2e7ff;
+    --palette6: #0b57d0;
+    --palette7: #e9eef6;
+    --palette8: #e0edf5;
+    --palette9: #2021240f;
+    --palette10: #e1e3e1;
+    --palette11: #cccccc;
+    --palette12: #f6f6f6;
+    --palette13: #f2f6fc;
+    --palette14: #dedede;
+    --palette15: #eff2f3;
+    --palette16: #ffffff;
+    --palette17: #f7ca4c;
+    --palette18: #dd4b39;
 
-    --background: var(--palette2);
+    --background: var(--palette3);
     --text: var(--palette1);
-    --disabled-text: var(--palette7);
-    --draft-text: var(--palette11);
-    --header-background: var(--palette3);
-    --header-text: var(--palette9);
+    --disabled-text: var(--palette10);
+    --draft-text: var(--palette18);
+    --scrollbar-thumb-background: var(--palette11);
+    --scrollbar-track-background: var(--palette16);
+    --scrollbar-track-background-hover: var(--palette13);
+    --scrollbar-track-border-hover: var(--palette14);
+    --header-background: var(--palette4);
+    --header-text: var(--palette16);
     --header-text-hover: var(--palette1);
-    --footer-background: var(--palette3);
-    --footer-text: var(--palette9);
-    --email-folder-list-item-divider: var(--palette7);
-    --email-folder-list-item-backgroud-hover: var(--palette6);
-    --email-folder-list-item-backgroud-selected: var(--palette5);
-    --email-folder-list-compose-backgroud: var(--palette4);
-    --email-search-backgroud: var(--palette5);
-    --email-filter-backgroud: var(--palette9);
-    --email-filter-border: var(--palette7);
-    --email-filter-read-border: var(--palette7);
-    --email-filter-read-background-selected: var(--palette7);
-    --email-filter-read-background-hover: var(--palette7);
-    --email-preview-backgroud: var(--palette8);
-    --email-preview-backgroud-unread: var(--palette9);
-    --email-preview-starred: var(--palette10);
-    --email-details-backgound: var(--palette9);
-    --email-list-icon-backgroud-hover: var(--palette6);
+    --footer-background: var(--palette4);
+    --footer-text: var(--palette16);
+    --email-folder-list-item-divider: var(--palette10);
+    --email-folder-list-item-background-hover: var(--palette9);
+    --email-folder-list-item-background-selected: var(--palette7);
+    --email-folder-list-compose-background: var(--palette5);
+    --email-search-background: var(--palette7);
+    --email-filter-background: var(--palette16);
+    --email-filter-border: var(--palette10);
+    --email-filter-read-border: var(--palette10);
+    --email-filter-read-background: var(--palette16);
+    --email-filter-read-background-selected: var(--palette10);
+    --email-filter-read-background-hover: var(--palette10);
+    --email-preview-background: var(--palette12);
+    --email-preview-background-unread: var(--palette16);
+    --email-preview-starred: var(--palette17);
+    --email-details-backgound: var(--palette16);
+    --email-list-background: var(--palette16);
+    --email-list-icon-background-hover: var(--palette9);
+    --email-compose-background: var(--palette16);
+    --email-compose-header: var(--palette2);
+    --email-compose-background-header: var(--palette12);
+    --email-compose-field-border: var(--palette15);
+    --email-compose-button: var(--palette16);
+    --email-compose-button-background: var(--palette6);
 
+    --mobile-background: var(--palette16);
+    --mobile-email-preview-background: var(--palette16);
+    --mobile-email-preview-background-hover: var(--palette16);
+    --mobile-email-compose-background-header: var(--palette16);
+    --mobile-overlay-background: var(--palette11);
+    --mobile-email-folder-list-background: var(--palette8);
 
-    /**/
-    --gm3-sys-color-background: #fff;
-    --gm3-sys-color-error: #b3261e;
-    --gm3-sys-color-error-container: #f9dedc;
-    --gm3-sys-color-inverse-on-surface: #f2f2f2;
-    --gm3-sys-color-inverse-primary: #a8c7fa;
-    --gm3-sys-color-inverse-surface: #303030;
-    --gm3-sys-color-on-background: #1f1f1f;
-    --gm3-sys-color-on-error: #fff;
-    --gm3-sys-color-on-error-container: #410e0b;
-    --gm3-sys-color-on-primary: #fff;
-    --gm3-sys-color-on-primary-container: #041e49;
-    --gm3-sys-color-on-primary-fixed: #041e49;
-    --gm3-sys-color-on-primary-fixed-variant: #0842a0;
-    --gm3-sys-color-on-secondary: #fff;
-    --gm3-sys-color-on-secondary-container: #001d35;
-    --gm3-sys-color-on-secondary-fixed: #001d35;
-    --gm3-sys-color-on-secondary-fixed-variant: #004a77;
-    --gm3-sys-color-on-surface: #1f1f1f;
-    --gm3-sys-color-on-surface-variant: #444746;
-    --gm3-sys-color-on-tertiary: #fff;
-    --gm3-sys-color-on-tertiary-container: #072711;
-    --gm3-sys-color-on-tertiary-fixed: #072711;
-    --gm3-sys-color-on-tertiary-fixed-variant: #0f5223;
-    --gm3-sys-color-outline: #747775;
-    --gm3-sys-color-outline-variant: #c4c7c5;
-    --gm3-sys-color-primary: #0b57d0;
-    --gm3-sys-color-primary-container: #d3e3fd;
-    --gm3-sys-color-primary-fixed: #d3e3fd;
-    --gm3-sys-color-primary-fixed-dim: #a8c7fa;
-    --gm3-sys-color-scrim: #000;
-    --gm3-sys-color-secondary: #00639b;
-    --gm3-sys-color-secondary-container: #c2e7ff;
-    --gm3-sys-color-secondary-fixed: #c2e7ff;
-    --gm3-sys-color-secondary-fixed-dim: #7fcfff;
-    --gm3-sys-color-shadow: #000;
-    --gm3-sys-color-surface: #fff;
-    --gm3-sys-color-surface-bright: #fff;
-    --gm3-sys-color-surface-container: #f0f4f9;
-    --gm3-sys-color-surface-container-high: #e9eef6;
-    --gm3-sys-color-surface-container-highest: #dde3ea;
-    --gm3-sys-color-surface-container-low: #f8fafd;
-    --gm3-sys-color-surface-container-lowest: #fff;
-    --gm3-sys-color-surface-dim: #d3dbe5;
-    --gm3-sys-color-surface-tint: #6991d6;
-    --gm3-sys-color-surface-variant: #e1e3e1;
-    --gm3-sys-color-tertiary: #146c2e;
-    --gm3-sys-color-tertiary-container: #c4eed0;
-    --gm3-sys-color-tertiary-fixed: #c4eed0;
-    --gm3-sys-color-tertiary-fixed-dim: #6dd58c;
-
+    /* size */
+    --mobile-max-size: 991px;
 }
 
 

@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { utilService } from '../services/util.service';
+import { emailService } from '../services/email.service';
 
 export function EmailPreview({selecedFolder, email, onPress, onStar, onDelete, onUnread}) {
+
+    const [isRead, setIsRead] = useState(email.isRead);
 
     const navigate = useNavigate();
 
@@ -24,38 +27,55 @@ export function EmailPreview({selecedFolder, email, onPress, onStar, onDelete, o
     }
 
     function handleUnread(ev) {
+        setIsRead(!email.isRead);
         ev.stopPropagation();
         onUnread(email);    
     }
 
-    const trClass = `email-preview${email.isRead ? '' : ' unread'}${email.isStarred ? ' starred' : ''}${email.isDraft ? ' draft' : ''}`;
+    const trClass = `email-preview${isRead ? '' : ' unread'}${email.isStarred ? ' starred' : ''}${email.isDraft ? ' draft' : ''}`;
     const iconDisabledClass = selecedFolder === "trash" 
                     ? "disabled" 
                     : "";
-    const subject = email.subject === null || email.subject === '' 
-                    ? '(no subject)' 
-                    : email.subject;
+
+    const avatar = email.to === emailService.loggedinUser.email
+                    ? email.from && email.from.length > 0 ? email.from.charAt(0).toUpperCase() : '' 
+                    : email.to && email.to.length > 0 ? email.to.charAt(0).toUpperCase() : '' ;
+
+    const avatarColor = utilService.getDummyColor();
+
+    const subject = (email.subject === null || email.subject === '' 
+                     ? '(no subject)' 
+                     : email.subject);
+
+    const subjectBodySeperator = (email.body === null || email.body === '' 
+                     ? 'hide-content' 
+                     : '');
+
     const date = email.isDraft
                     ? email.createAt
                     : email.sentAt;
-    const iconRead = email.isRead 
+
+    const iconRead = isRead 
                     ? 'fa-solid fa-envelope-circle-check' 
                     : 'fa-regular fa-envelope-open';
 
     return (
-        <tr className={trClass} onClick={() => onPress(email)}>
-            <td className="star"><i className="fa-regular fa-star" onClick={(event) => {
+        <div className={trClass} onClick={() => onPress(email)}>
+            <span className="star"><i className="fa-regular fa-star" onClick={(event) => {
                     event.stopPropagation();
-                    onStar(email);}}></i></td>
-            <td className="email">{email.from}</td>
-            <td className="draft">Draft</td>
-            <td className="subject">{subject}</td>
-            <td className="date">{utilService.formatListDate(date)}</td>
-            <td className="actions">
-            <i className={`fa-solid fa-arrow-up-from-bracket ${iconDisabledClass}`}></i>
-            <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
-            <i className={`${iconRead}`} onClick={handleUnread}></i>
-            </td>
-        </tr>
+                    onStar(email);}}></i></span>
+            <span className="avatar" style={{ background: avatarColor }}>{avatar}</span>
+            <span className="email">{email.from}</span>
+            <span className="draft">Draft</span>
+            <span className="subject">{subject}</span>
+            <span className={`subject-body-seprerator ${subjectBodySeperator}`}>-</span>
+            <span className="body">{email.body}</span>
+            <span className="date">{utilService.formatListDate(date)}</span>
+            <span className="actions">
+                <i className={`fa-solid fa-arrow-up-from-bracket ${iconDisabledClass}`}></i>
+                <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
+                <i className={`${iconRead}`} onClick={handleUnread}></i>
+            </span>
+        </div> 
     )
 }

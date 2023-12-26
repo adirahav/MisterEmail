@@ -5,6 +5,8 @@ const STORAGE_KEY = 'emails'
 const DEFAULT_FOLDER = 'inbox'
 const DEFAULT_SORT_BY = 'sentAt'
 const DEFAULT_SORT_DIRECTION = 'desc'
+const DEFAULT_MULTY_CHECKED = 'unchecked'
+const DEFAULT_MULTY_FILTER = 'none'
 
 const loggedinUser = {
     email: 'user@appsus.com',
@@ -17,9 +19,11 @@ export const emailService = {
     send,
     remove,
     getById,
+    actionByIds,
     createEmail,
     getDefaultEmails,
     getDefaultFilter,
+    getDefaultMultyChecked,
     getDefaultSort,
     loggedinUser
 }
@@ -129,6 +133,39 @@ async function query(filterBy, sortBy) {
     }
 }
 
+async function actionByIds(IDs, action) {
+    
+    const emails = await storageService.query(STORAGE_KEY)
+    const filteredEmails = emails.filter(email => IDs.includes(email.id))
+    
+    const updatedEmails = filteredEmails.map((email) => {
+        if (IDs.includes(email.id)) {
+            switch (action) {
+                case "delete":
+                    email.isDeleted = true;
+                    break;
+                case "read":
+                    email.isRead = true;
+                    break;
+                case "unread":
+                    email.isRead = false;
+                    break;
+                case "starred":
+                    email.isStarred = true;
+                    break;
+                case "unstarred":
+                    email.isStarred = false;
+                    break;
+            }
+        }
+
+        return email;
+    });
+
+    const results = await storageService.putList(STORAGE_KEY, updatedEmails);
+    return results;
+}
+
 function getById(id) {
     return storageService.get(STORAGE_KEY, id)
 }
@@ -185,6 +222,15 @@ function getDefaultFilter() {
         status: DEFAULT_FOLDER,
         txt: '',
         read: null
+    }
+}
+
+function getDefaultMultyChecked() {
+    return {
+        checked: DEFAULT_MULTY_CHECKED,  // checked | unchecked | partial
+        filter: DEFAULT_MULTY_FILTER,    // all | none | read | unread | starred | unstarred
+        action: null,
+        showActions: false
     }
 }
 

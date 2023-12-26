@@ -1,61 +1,73 @@
 import React from 'react'
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { utilService } from '../services/util.service';
+import { emailService } from "../services/email.service";
 
-export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDelete }) {
-    const [header, setHeader] = useState(composedEmail && composedEmail.subject ? composedEmail.subject : "New Message")
-    const [recipients, setRecipients] = useState(composedEmail ? composedEmail.to : '');
-    const [subject, setSubject] = useState(composedEmail ? composedEmail.subject : '');
-    const [body, setBody] = useState(composedEmail ? composedEmail.body : '');
-    const [draftEmail, setDraftEmail] = useState(composedEmail);
+export function EmailCompose() {
+    const location = useLocation();
+
+    const { onAutoSave, onSend, onDelete } = useOutletContext()
+    const [draftEmail, setDraftEmail] = useState(null);
+    const [header, setHeader] = useState('')
     const [lastDraftEmail, setLastDraftEmail] = useState(null);
     const [autoSaveInterval, setAutoSaveInterval] = useState(null);
     const [resize, setResize] = useState('maximize');
     const [fullscreen, setFullscreen] = useState('not-fullscreen');
+    const [urlParams, setURLParams] = useSearchParams(new URLSearchParams(location.search))
     
+    const params = useParams();
+    const navigate = useNavigate();
     const AUTO_SAVE_TIME = 5 * 1000;    // 5 seconds in milliseconds
 
-    // new draft email
+    // load email
     useEffect(() => {
-        setDraftEmail((prevDraftEmail) => {
-            if (prevDraftEmail.id !== composedEmail.id) {
-                setHeader(composedEmail.subject === "" ? "New Message" : composedEmail.subject)
-                setRecipients(composedEmail.recipients);
-                setSubject(composedEmail.subject);
-                setBody(composedEmail.body);
-            }
+        loadEmail();
+    }, [params.emailId])
 
-            return { ...prevDraftEmail, ...composedEmail }; 
-        });
+    async function loadEmail() {
+        try {   
+            const email = params.emailId
+                            ? await emailService.getById(params.emailId)
+                            : await getParamsFromURL();
+            
+            setDraftEmail(email)
+        } catch (err) {
+            navigate('/email')
+            console.log('Had issues loading email', err);
+        }
+    }
 
-        //setDraftEmail(prevDraftEmail => ({ ...prevDraftEmail, ...composedEmail }))
-        setLastDraftEmail(composedEmail);
-    }, [composedEmail]);
+    async function getParamsFromURL() {
+        const email = await emailService.createEmail();
+        
+        for (const field in email) {
+            email[field] = urlParams.get(field) || email[field];
+        }
+        
+        return email
+    }
+
+    // header
+    useEffect(() => {
+        setHeader(draftEmail && draftEmail.subject !== '' ? draftEmail.subject : "New Message");
+    }, [draftEmail])
 
     // field change action
     const handleFieldChanged = (ev) => {
         const { name, value } = ev.target;
     
-        setDraftEmail((prevDraftEmail) => {
-            const updatedDraft = { ...prevDraftEmail };
-    
-            switch (name) {
-                case "recipients":
-                    setRecipients(value);
-                    updatedDraft.to = value;
-                    break;
-                case "subject":
-                    setSubject(value);
-                    updatedDraft.subject = value;
-                    break;
-                case "body":
-                    setBody(value);
-                    updatedDraft.body = value;
-                    break;
-            }
-    
-            return updatedDraft;
-        });
+        switch (name) {
+            case "to":
+                setDraftEmail({...draftEmail, to: value});
+                break;
+            case "subject":
+                setDraftEmail({...draftEmail, subject: value});
+                break;
+            case "body":
+                setDraftEmail({...draftEmail, body: value});
+                break;
+        }
     };
 
     // auto save
@@ -75,8 +87,8 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
                             onAutoSave(prevDraftEmail);
                             setHeader("Draft saved");
                             setTimeout(() => {
-                                setHeader(prevDraftEmail.subject);
-                            }, 5000);
+                                setHeader(prevDraftEmail && prevDraftEmail.subject !== '' ? prevDraftEmail.subject : "New Message");
+                            }, AUTO_SAVE_TIME);
                             return prevDraftEmail; // return the changed state: setLastDraftEmail(prevDraftEmail)
                         }
                     }
@@ -91,38 +103,44 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
         setAutoSaveInterval(intervalId);
     };
     
+    // close
+    const handleClose = () => {
+        //navigate(-1);
+        navigate(`/email`);
+    }
     
     // send
     const handleSend = () => {
         function sendEmail() {
-            draftEmail.to = recipients;
-            draftEmail.subject = subject;
-            draftEmail.body = body;
             onSend(draftEmail);
-            onClose();
+            handleClose();
         }
 
-        if (utilService.hasValidEmail(recipients)) {
+        if (utilService.hasValidEmail(draftEmail.to)) {
             if (!subject && !body) {
                 const result = window.confirm("`Send this message without a subject or text in the body?`");
                 if (result) {
-                    sendEmail()
+                    sendEmail();
                 }
             }
             else {
-                sendEmail()
+                sendEmail();
             }
         } 
         else {
-            alert(`Error\n
-            Please specify at least one recipient.`);
+            showErrorAlert({
+                message: 'Please specify at least one recipient.',
+                closeButton: { show: false, autoClose: false }, 
+                positiveButton: { show: true, text: "OK", onPress: null, closeAfterPress: true }, 
+                negativeButton: { show: false } 
+            });
         }
     };
 
     // delete
-    const handleOnDelete = () => {
+    const handleDelete = () => {
         onDelete(draftEmail);
-        onClose();
+        handleClose();
     };
 
     // resize
@@ -151,6 +169,8 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
 
     const fullscreenClass = `fa-solid ${fullscreen == 'fullscreen' ?  'fa-solid fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} fa-xs`;
 
+    if (!draftEmail) return <></>;
+
     return (
         <article className={`email-compose ${resize} ${fullscreen}`}>
             <header className="web">
@@ -158,14 +178,14 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
                 <div>
                     <i className={resizeClass} onClick={windowResize}></i>
                     <i className={fullscreenClass} onClick={windowFullscreen}></i>
-                    <i className="fa-solid fa-xmark" onClick={onClose}></i>
+                    <i className="fa-solid fa-xmark" onClick={handleClose}></i>
                 </div>
             </header>
             <header className="mobile">
-                <h2><i className="fa-solid fa-arrow-left" onClick={onClose}></i></h2>
+                <h2><i className="fa-solid fa-arrow-left" onClick={handleClose}></i></h2>
                 <div>
                     <i className="fa-regular fa-paper-plane" onClick={handleSend}></i>
-                    <i className="fa-regular fa-trash-can" onClick={handleOnDelete}></i>
+                    <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
                 </div>
             </header>
             <div className="new-message">
@@ -173,9 +193,9 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
                     <input
                         type="text"
                         placeholder="Recipients"
-                        value={recipients ?? ''}
-                        id="recipients"
-                        name="recipients"
+                        value={draftEmail.to ?? ''}
+                        id="to"
+                        name="to"
                         onChange={handleFieldChanged}
                     />
                 </div>
@@ -183,7 +203,7 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
                     <input
                         type="text"
                         placeholder="Subject"
-                        value={subject ?? ''}
+                        value={draftEmail.subject ?? ''}
                         id="subject"
                         name="subject"
                         onChange={handleFieldChanged}
@@ -192,11 +212,11 @@ export function EmailCompose({ composedEmail, onClose, onAutoSave, onSend, onDel
                 <textarea className='body' 
                         id="body"
                         name="body"
-                        value={body ?? ''}
+                        value={draftEmail.body ?? ''}
                         onChange={handleFieldChanged} />
                 <div className='actions'>
                     <button className='send' onClick={handleSend}>Send</button>
-                    <i className="fa-regular fa-trash-can" onClick={handleOnDelete}></i>
+                    <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
                 </div>
             </div>
         </article>

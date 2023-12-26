@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { utilService } from '../services/util.service';
 import { emailService } from '../services/email.service';
 
-export function EmailPreview({selecedFolder, email, onPress, onStar, onDelete, onUnread}) {
-
-    const [isRead, setIsRead] = useState(email.isRead);
+export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, onDelete, onUnread}) {
 
     const navigate = useNavigate();
 
@@ -27,13 +25,12 @@ export function EmailPreview({selecedFolder, email, onPress, onStar, onDelete, o
     }
 
     function handleUnread(ev) {
-        setIsRead(!email.isRead);
         ev.stopPropagation();
         onUnread(email);    
     }
-
-    const trClass = `email-preview${isRead ? '' : ' unread'}${email.isStarred ? ' starred' : ''}${email.isDraft ? ' draft' : ''}`;
-    const iconDisabledClass = selecedFolder === "trash" 
+    
+    const trClass = `email-preview id-${email.id}${email.isRead ? '' : ' unread'}${email.isStarred ? ' starred' : ''}${email.isDraft ? ' draft' : ''}`;
+    const iconDisabledClass = selectedFolder === "trash" 
                     ? "disabled" 
                     : "";
 
@@ -55,15 +52,24 @@ export function EmailPreview({selecedFolder, email, onPress, onStar, onDelete, o
                     ? email.createAt
                     : email.sentAt;
 
-    const iconRead = isRead 
+    const iconRead = email.isRead 
                     ? 'fa-solid fa-envelope-circle-check' 
                     : 'fa-regular fa-envelope-open';
 
+    const handleCheck = (ev) => {
+        ev.stopPropagation();    
+        onCheck()
+    }
+
+    const handleStar = (ev) => {
+        ev.stopPropagation();
+        onStar(email);
+    }
+
     return (
         <div className={trClass} onClick={() => onPress(email)}>
-            <span className="star"><i className="fa-regular fa-star" onClick={(event) => {
-                    event.stopPropagation();
-                    onStar(email);}}></i></span>
+            <span className="checkbox"><input type="checkbox" onClick={handleCheck} /></span>
+            <span className="star"><i className="fa-regular fa-star" onClick={handleStar}></i></span>
             <span className="avatar" style={{ background: avatarColor }}>{avatar}</span>
             <span className="email">{email.from}</span>
             <span className="draft">Draft</span>

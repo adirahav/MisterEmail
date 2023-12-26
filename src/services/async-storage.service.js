@@ -3,6 +3,7 @@ export const storageService = {
     get,
     post,
     put,
+    putList,
     remove,
 }
 
@@ -34,6 +35,22 @@ async function put(entityType, updatedEntity) {
     entities.splice(idx, 1, updatedEntity)
     _save(entityType, entities)
     return updatedEntity
+}
+
+async function putList(entityType, updatedEntities) {
+    const entities = await query(entityType);
+
+    updatedEntities.forEach(updatedEntity => {
+        const idx = entities.findIndex(entity => entity.id === updatedEntity.id);
+        if (idx >= 0) {
+            entities.splice(idx, 1, updatedEntity);
+        } else {
+            console.warn(`Entity with id ${updatedEntity.id} not found in: ${entityType}`);
+        }
+    });
+
+    _save(entityType, entities);
+    return updatedEntities;
 }
 
 async function remove(entityType, entityId) {

@@ -1,31 +1,32 @@
 import React from 'react'
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { EmailFolderList } from "../cmps/EmailFolderList";
 import { EmailFilter } from '../cmps/EmailFilter';
 import { EmailList } from '../cmps/EmailList';
-import { EmailDetails } from '../cmps/EmailDetails';
-import { EmailCompose } from '../cmps/EmailCompose';
 import { EmailComposeButton } from "../cmps/EmailComposeButton";
+import { Overlay } from '../cmps/Overlay';
 import { emailService } from '../services/email.service';
 import { utilService } from '../services/util.service';
-import { Overlay } from '../cmps/Overlay';
 
 export function EmailIndex() {
 
     const [emails, setEmails] = useState(emailService.getDefaultEmails());
     const [showOverlay, setshowOverlay] = useState(!utilService.isMobile());
     const [folderList, setFolderList] = useState({});
+
     const [filterBy, setFilterBy] = useState(emailService.getDefaultFilter());
     const [sortBy, setSortBy] = useState(emailService.getDefaultSort());
-    const [composedEmail, setComposedEmail] = useState(null);
-    const [detailsEmail, setDetailsEmail] = useState(null);
+    const [multyCheckedBy, setMultyCheckedBy] = useState(emailService.getDefaultMultyChecked());
+    
+    const [showEmailList, setShowEmailList] = useState(true);
     const [showFolderList, setShowFolderList] = useState(!utilService.isMobile());
     const [showFloatingComposeButton, setShowFloatingComposeButton] = useState(utilService.isMobile());
-    
-    const { emailId } = useParams();
+    const [showSearchOnly, setShowSearchOnly] = useState(utilService.isMobile());
     
     const navigate = useNavigate();
+    const location = useLocation();
+    const params = useParams();
 
     // fetch emails
     const fetchEmails = async () => {
@@ -35,29 +36,7 @@ export function EmailIndex() {
 
             orgenizeFolderList(result);
 
-            // load details on refresh
-            setDetailsEmail(
-                window.location.hash.includes('/details/') 
-                    ? result.list.find((email) => email.id === emailId)  
-                    : null
-            );
-
-            // load compose on refresh
-            setComposedEmail(
-                window.location.hash.includes('/compose/') 
-                    ? result.list.find((email) => email.id === emailId)  
-                    : null
-            );
-
-            // floating compose button
-            setShowFloatingComposeButton(
-                !utilService.isMobile() 
-                    ? false 
-                    : window.location.hash.includes('/compose/') || window.location.hash.includes('/details/')
-                        ? false
-                        : true
-            );
-
+            setMultyCheckedBy(emailService.getDefaultMultyChecked());
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -68,70 +47,37 @@ export function EmailIndex() {
         fetchEmails();
     }, [filterBy, sortBy]);
 
-    // inner pages
     useEffect(() => {
-        const handleHashChange = async () => {
-            const currentPath = window.location.pathname;
-            if (currentPath.includes('/details/')) {
-                setDetailsEmail((prevDetailsEmails) => {
-                    return prevDetailsEmails ? prevDetailsEmails : null;
-                });
-            }
-            else {
-                setDetailsEmail(null);
-            }
-    
-            if (currentPath.includes('/compose/')) {
-                const result = await emailService.query(filterBy, sortBy);
-                setEmails(result);
-    
-                orgenizeFolderList(result);
+        if (params.folder) {
+            filterBy.status = params.folder;
+        }
+        fetchEmails();
+    }, [params.folder]);
 
-                setComposedEmail((prevDetailsEmails) => {
-                    return prevDetailsEmails ? prevDetailsEmails : null;
-                });
-            }
-            else {
-                setComposedEmail(null);
-            }
-        };
-      
-        window.addEventListener('hashchange', handleHashChange);
-        handleHashChange();
-      
-        return () => {
-            window.removeEventListener('hashchange', handleHashChange);
-        };
-    }, [navigate]);
+    useEffect(() => {
+        setShowFloatingComposeButton(
+            !utilService.isMobile() 
+                ? false 
+                : window.location.hash.includes('/compose/') || window.location.hash.includes('/details/')
+                    ? false
+                    : true
+        );
+
+        setShowSearchOnly(window.location.hash.includes('/details/'));
+
+        setShowEmailList(
+            !window.location.hash.includes('/details/')
+        );
+    }, [location]);
     
     // folder list 
     function orgenizeFolderList(result) {
         setFolderList({
-                inbox: { 
-                    label: "Inbox", 
-                    count: result.newInboxCount,
-                    icon: "fa-solid fa-inbox"
-                },
-                starred: { 
-                    label: "Starred", 
-                    count: result.starredCount,
-                    icon: "fa-regular fa-star"
-                },
-                sent: { 
-                    label: "Sent", 
-                    count: result.sentCount,
-                    icon: "fa-regular fa-paper-plane"
-                },
-                draft: { 
-                    label: "Draft", 
-                    count: result.draftCount,
-                    icon: "fa-brands fa-firstdraft"
-                },
-                trash: { 
-                    label: "Trash", 
-                    count: result.trashCount,
-                    icon: "fa-regular fa-trash-can"
-                },
+                inbox:  { label: "Inbox",   count: result.newInboxCount,    icon: "fa-solid fa-inbox"},
+                starred:{ label: "Starred", count: result.starredCount,     icon: "fa-regular fa-star"},
+                sent:   { label: "Sent",    count: result.sentCount,        icon: "fa-regular fa-paper-plane"},
+                draft:  { label: "Draft",   count: result.draftCount,       icon: "fa-brands fa-firstdraft"},
+                trash:  { label: "Trash",   count: result.trashCount,       icon: "fa-regular fa-trash-can"},
             }
         )
     }
@@ -187,17 +133,106 @@ export function EmailIndex() {
             
             updateFolderList(originPressedEmail, pressedEmail);
         }
-
+        
         if (pressedEmail.isDraft) {
-            setComposedEmail(pressedEmail);
             navigate(`/email/compose/${pressedEmail.id}`);
         }
-        else {
-            setDetailsEmail(pressedEmail);
-            navigate(`/email/details/${pressedEmail.id}`);
-        }    
+        else {          
+            navigate(`/email/${filterStatus}/details/${pressedEmail.id}`);       
+        }     
     }
 
+    // multy check / uncheck
+    function onEmailCheck() {
+
+        setMultyCheckedBy((prevMultyChecked) => {
+            return { ...prevMultyChecked, 
+                filter: null, 
+            };
+        });
+
+        setMultyCheckedBy((prevMultyChecked) => {
+            return { ...prevMultyChecked, 
+                showActions: shouldShowMultyActions(),
+                checked: shouldCheckMultyCheckbox()
+            };
+        });
+    }
+
+    async function onSetMultyChecked(multyChecked) {
+        if (multyCheckedBy.filter !== multyChecked.filter) {
+            const allCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]');
+            allCheckboxes.forEach((checkbox) => {
+                switch (multyChecked.filter) {
+                    case "all": checkbox.checked = true; break;
+                    case "none": checkbox.checked = false; break;
+                    case "read": checkbox.checked = !checkbox.parentNode.parentNode.className.includes("unread"); break;
+                    case "unread": checkbox.checked = checkbox.parentNode.parentNode.className.includes("unread"); break;
+                    case "starred": checkbox.checked = checkbox.parentNode.parentNode.className.includes("starred"); break;
+                    case "unstarred": checkbox.checked = !checkbox.parentNode.parentNode.className.includes("starred"); break;
+                }
+            });
+
+            setMultyCheckedBy((prevMultyChecked) => {
+                return { ...prevMultyChecked, 
+                    filter: multyChecked.filter, 
+                    showActions: shouldShowMultyActions(),
+                    checked: shouldCheckMultyCheckbox()
+                };
+            });
+        }
+        
+        if (multyCheckedBy.action !== multyChecked.action) {
+            var checkedIDs = [];
+            const checkedCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]:checked');
+            checkedCheckboxes.forEach((checkbox) => { 
+                checkedIDs.push(
+                    Array.from(checkbox.parentNode.parentNode.classList)
+                        .filter((className) => className.startsWith('id-'))[0]
+                        .replace("id-", "")
+                );
+                checkbox.checked = false;
+            });
+
+            const results = await emailService.actionByIds(checkedIDs, multyChecked.action);
+            
+            fetchEmails(() => {
+                setEmails((prevEmails) => {
+                    return {
+                        ...prevEmails, 
+                        list: results
+                    };
+                });
+            });
+
+            setMultyCheckedBy((prevMultyChecked) => {
+                return { ...prevMultyChecked, 
+                    action: null, 
+                    showActions: "none",
+                    checked: false
+                };
+            });
+        }
+    }
+
+    function shouldShowMultyActions() {
+        const checkedCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]:checked');
+        const showActions = checkedCheckboxes.length > 0;
+        return showActions;
+    }
+
+    function shouldCheckMultyCheckbox() {
+        const allCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]');
+        const checkedCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]:checked');
+
+        const checked = allCheckboxes.length === 0 || checkedCheckboxes.length === 0
+                            ? "unchecked"
+                            : allCheckboxes.length === checkedCheckboxes.length
+                                ? "checked" 
+                                : "partial";
+        return checked;
+    }
+    
     // star / unstar
     async function onEmailStar(pressedEmail) {
         const originPressedEmail = JSON.parse(JSON.stringify(pressedEmail));
@@ -248,11 +283,16 @@ export function EmailIndex() {
 
     // filter
     function onSetFilter(filterBy) {
+        setFilterBy(filterBy);
+
         if (utilService.isMobile() && showFolderList) {
             onToggleFolderList();
         }
-
-        setFilterBy(prevFilter => ({ ...prevFilter, ...filterBy }))
+    
+        const urlParams = new URLSearchParams(location.search)
+        if (urlParams.size === 0) {
+            navigate(`/email/${filterBy.status}`);
+        }
     }
 
     const { status: filterStatus, txt: filterText, read: filterRead } = filterBy
@@ -265,26 +305,12 @@ export function EmailIndex() {
     }
 
     // compose
-    useEffect(() => {
-        if (composedEmail !== null && composedEmail !== undefined) {
-          navigate(`/email/compose/${composedEmail.id}`);
-        }
-    }, [composedEmail]);
-
     async function onShowComposeEmail(email) {
         if (!email) {
-            await onComposeEmail();
+            email = await emailService.createEmail();
         }
-        else {
-            setComposedEmail(email);
-        }
-    }
-
-    async function onComposeEmail() {
-        const newEmail = await emailService.createEmail();
-        setComposedEmail(newEmail);
-
-        updateFolderList(newEmail);
+        
+        navigate(`/email/compose/${email.id}`);
     }
 
     async function onEmailSave(email) {
@@ -305,30 +331,17 @@ export function EmailIndex() {
         updateFolderList(originPressedEmail, email);
     }
 
-    const onComposeClose = () => {
-        setComposedEmail(null);
-        navigate(-1);
-    };
-    
     return ( <>
         {showOverlay && <Overlay onPress={onToggleFolderList} />}
 
         <aside>
-            <EmailFolderList selecedFolder={filterStatus} folderList={folderList} onSelectFolder={onSetFilter} onShowComposeEmail={onShowComposeEmail} showFolderList={showFolderList} />
+            <EmailFolderList selectedFolder={filterStatus} folderList={folderList} onSelectFolder={onSetFilter} onShowComposeEmail={onShowComposeEmail} showFolderList={showFolderList} />
         </aside>
         <main>
-            <EmailFilter displaySort={!detailsEmail} filterBy={filterBy} onSetFilter={onSetFilter} sortBy={{sortField, sortDirection}} onSetSort={onSetSort} onToggleFolderList={onToggleFolderList} />        
-            {!detailsEmail && <EmailList selecedFolder={filterStatus} emails={emails.list} onPress={onEmailPress} onStar={onEmailStar} onDelete={onEmailDelete} onUnread={onEmailUnread} />}  
-            {detailsEmail && <EmailDetails email={detailsEmail} onDelete={onEmailDelete} />}  
+            <EmailFilter showSearchOnly={showSearchOnly} filterBy={filterBy} onSetFilter={onSetFilter} sortBy={{sortField, sortDirection}} onSetSort={onSetSort} multyCheckedBy={multyCheckedBy} onSetMultyChecked={onSetMultyChecked} onMobileToggleFolderList={onToggleFolderList} />        
+            {showEmailList && <EmailList selectedFolder={filterStatus} emails={emails.list} onPress={onEmailPress} onCheck={onEmailCheck} onStar={onEmailStar} onDelete={onEmailDelete} onUnread={onEmailUnread} />}  
+            <Outlet context={{ onDelete: onEmailDelete, onAutoSave: onEmailSave, onSend: onEmailSend}} />
         </main> 
-        {composedEmail && (
-            <EmailCompose
-                composedEmail={composedEmail}
-                onClose={() => { onComposeClose() }}
-                onAutoSave={onEmailSave}
-                onSend={onEmailSend}
-                onDelete={() => onEmailDelete(composedEmail, false)}
-            />)}
         {showFloatingComposeButton && <EmailComposeButton onShowComposeEmail={onShowComposeEmail} />}
     </>)
 }

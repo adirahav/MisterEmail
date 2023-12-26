@@ -162,8 +162,8 @@
 }
 
 .email-compose .new-message .actions .send {
-    background-color: var(--email-compose-button-background);
-    color: var(--email-compose-button);
+    background-color: var(--button-positive-background);
+    color: var(--button-positive);
     width: 104px;
     height: 36px;
     border-radius: 18px;
@@ -335,11 +335,11 @@
     align-items: center;
     justify-content: flex-start;
     font-size: 15px;
-    min-height: 30px; 
+    min-height: 45px; 
     background: var(--email-filter-background);
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-    padding: 10px 5px;
+    padding: 0 5px;
 }
 
 .email-filter ul li {
@@ -361,7 +361,17 @@
     text-align: center;
 }
 
-.email-filter ul li.read ul {
+.email-filter ul li.drop-down.partial input[type="checkbox"]:after {
+    content: '\2013'; 
+    font-size: 12px;
+    top: -4.5px;
+    position: relative;
+    left: 3px;
+    font-weight: bold;
+    color: var(--text);
+}
+
+.email-filter ul li.drop-down ul {
     position: absolute;
     display: block;
     background: var(--email-filter-read-background);
@@ -374,7 +384,7 @@
     z-index: 3;
 }
 
-.email-filter ul li.read ul li {
+.email-filter ul li.drop-down ul li {
     border: 0;
     border-radius: 0;
     padding-left: 50px;
@@ -385,15 +395,15 @@
     align-items: center;
 }
 
-.email-filter ul li.read ul li.selected {
+.email-filter ul li.drop-down ul li.selected {
     background-color: var(--email-folder-list-item-background-selected);
 }
 
-.email-filter ul li.read ul li:hover {
+.email-filter ul li.drop-down ul li:hover {
     background-color: var(--email-folder-list-item-background-hover);
 }
 
-.email-filter ul li.read ul li.selected::before {
+.email-filter ul li.drop-down ul li.selected::before {
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
     -webkit-transform-origin: left;
@@ -411,6 +421,30 @@
     width: 5px;
 }
 
+.email-filter ul li.multy-select-actions {
+    border: 0;
+    border-radius: 16px;
+}
+
+.email-filter ul li.multy-select-actions i {
+    width: 36px;
+    height: 36px;
+    margin-right: 0px;
+    margin-left: 0px;
+    border-radius: 18px;
+    padding: 5px;
+    text-align: center;
+    align-items: center;
+    display: inline-grid;
+}
+
+.email-filter ul li.multy-select-actions i.star {
+    color: var(--email-starred);
+}
+
+.email-filter ul li.multy-select-actions i:hover {
+    background-color: var(--email-list-icon-background-hover);
+}
 
 @media screen and (max-width: 991px) { /* mobile */
     .email-filter form {
@@ -633,7 +667,7 @@
 /******************************/
 div.email-preview {
     display: grid;
-    grid-template-columns: 48px 232px auto auto 1fr 150px;
+    grid-template-columns: 28px 48px 232px auto auto 1fr 150px;
     gap: 0px;
     background-color: var(--email-preview-background);
     height: 40px;
@@ -676,7 +710,7 @@ div.email-preview span.star i {
 }
 
 div.email-preview.starred span.star i {
-    color: var(--email-preview-starred);
+    color: var(--email-starred);
 }
 
 div.email-preview span.avatar {

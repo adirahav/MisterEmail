@@ -127,6 +127,22 @@ input {
 }
 
 @media screen and (max-width: 991px) { /* mobile */
+    
+    .main-app main {
+        padding: 10px;
+    }
+
+    .main-app {
+        display: grid;
+        grid-template-columns: 1fr;		
+        grid-template-rows: auto 1fr auto;
+        gap: 0;
+        grid-template-areas:
+            "h"
+            "m"
+            "f";
+    }
+
     .main-app.has-aside {
         grid-template-columns: 1fr;		
         grid-template-areas:
@@ -157,6 +173,142 @@ a.active {
     .web {
         display: none!important;
     }
+}
+
+/* ============================ */
+/* alert                        */
+/* ============================ */
+
+.alert {
+    position: absolute;
+    top: calc(50% - 20px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    min-height: 290px;
+    margin: 20px auto; 
+    -webkit-box-shadow: 0px 8px 10px 1px rgba(0,0,0,.14), 0px 3px 14px 2px rgba(0,0,0,.12), 0px 5px 5px -3px rgba(0,0,0,.2);
+    box-shadow: 0px 8px 10px 1px rgba(0,0,0,.14), 0px 3px 14px 2px rgba(0,0,0,.12), 0px 5px 5px -3px rgba(0,0,0,.2);
+    border: 1px solid #ccc;
+    border-radius: 16px;
+    z-index: 5;
+    background-color: var(--email-compose-background);
+}
+
+.alert header {
+    background-color: var(--email-compose-background-header);
+    border-radius: 16px 16px 0 0;
+    height: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.alert header div {
+    display: flex;
+}
+
+.alert.message header div {
+    color: var(--message-text);
+}
+
+.alert.success header div {
+    color: var(--success-text);
+}
+
+.alert.warning header div {
+    color: var(--warning-text);
+}
+
+.alert.error header div {
+    color: var(--error-text);
+}
+
+.alert header div h2 {
+    font-size: 14px;
+    padding-left: 10px;
+}
+
+.alert header i {
+    width: 22px;
+    height: 22px;
+    margin: 0 2px;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    align-items: center;
+    display: inline-grid;
+    line-height: 1px;
+}
+
+.alert header i:not(:first-child):hover {
+    background-color: var(--email-list-icon-background-hover);
+}
+
+.alert .message {
+    display: inline-grid;
+    width: 100%;
+    height: 180px;
+    overflow: auto;
+}
+
+.alert .message:focus-visible {
+    outline: 0;
+}
+
+.alert .message::-webkit-scrollbar {
+    width: 10px;
+}
+  
+.alert .message::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-background);
+    border-radius: 0;
+}
+  
+.alert .message::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track-background);
+    border-radius: 0;
+}
+  
+.alert .message::-webkit-scrollbar-track:hover {
+    background-color: var(--scrollbar-track-background-hover);
+    border: 1px solid var(--scrollbar-track-border-hover);
+}
+
+.alert .message p {
+    font-size: 14px;
+    border: 0;
+    margin: 10px 20px;
+}
+
+.alert .buttons {
+    border: 0;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.alert .buttons button {
+    width: 104px;
+    height: 36px;
+    border-radius: 18px;
+    border: 0;
+    font-weight: bold;
+    margin: 5px 5px 0;
+}
+
+.alert .buttons button.positive {
+    background-color: var(--button-positive-background);
+    color: var(--button-positive);
+}
+
+.alert .buttons button.negative {
+    background-color: var(--button-negative-background);
+    color: var(--button-negative);
 }
 
 /* ============================ */

@@ -1,17 +1,41 @@
 import { utilService } from "../services/util.service";
-import {useNavigate} from 'react-router-dom';
+import { emailService } from "../services/email.service";
+import { useState, useEffect } from 'react';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
-export function EmailDetails({email, onDelete}) {
+export function EmailDetails() {
+    const { onDelete } = useOutletContext()
+    const [email, setEmail] = useState(null)
+    const params = useParams()
+
     const navigate = useNavigate();
 
+    useEffect(() => {
+        loadEmail()
+    }, [params.emailId])
+
+    async function loadEmail() {
+        try {   
+            const email = await emailService.getById(params.emailId)
+            setEmail(email)
+        } catch (err) {
+
+            navigate('/email')
+            console.log('Had issues loading email', err);
+        }
+    }
+
     const handleBackPress = () => {
-        navigate(-1); 
+
+        navigate(`/email`);
     };
 
     function handleDelete() {
         onDelete(email, true);
     }
 
+    if (!email) return <div>Loading..</div>
+    
     return (
         <section className="email-details">
             <article className="actions">

@@ -35,10 +35,15 @@
     --palette17: #f7ca4c;
     --palette18: #dd4b39;
 
+    
     --background: var(--palette3);
     --text: var(--palette1);
     --disabled-text: var(--palette10);
     --draft-text: var(--palette18);
+    --error-text: var(--palette18);
+    --warning-text: var(--palette17);
+    --success-text: var(--palette1);
+    --message-text: var(--palette1);
     --scrollbar-thumb-background: var(--palette11);
     --scrollbar-track-background: var(--palette16);
     --scrollbar-track-background-hover: var(--palette13);
@@ -48,6 +53,12 @@
     --header-text-hover: var(--palette1);
     --footer-background: var(--palette4);
     --footer-text: var(--palette16);
+    --footer-help-background: var(--palette6); 
+    --footer-help-border: var(--palette2); 
+    --button-positive: var(--palette16);
+    --button-positive-background: var(--palette6);
+    --button-negative: var(--palette16);
+    --button-negative-background: var(--palette10);
     --email-folder-list-item-divider: var(--palette10);
     --email-folder-list-item-background-hover: var(--palette9);
     --email-folder-list-item-background-selected: var(--palette7);
@@ -61,7 +72,7 @@
     --email-filter-read-background-hover: var(--palette10);
     --email-preview-background: var(--palette12);
     --email-preview-background-unread: var(--palette16);
-    --email-preview-starred: var(--palette17);
+    --email-starred: var(--palette17);
     --email-details-backgound: var(--palette16);
     --email-list-background: var(--palette16);
     --email-list-icon-background-hover: var(--palette9);
@@ -69,15 +80,14 @@
     --email-compose-header: var(--palette2);
     --email-compose-background-header: var(--palette12);
     --email-compose-field-border: var(--palette15);
-    --email-compose-button: var(--palette16);
-    --email-compose-button-background: var(--palette6);
-
+    
     --mobile-background: var(--palette16);
     --mobile-email-preview-background: var(--palette16);
     --mobile-email-preview-background-hover: var(--palette16);
     --mobile-email-compose-background-header: var(--palette16);
     --mobile-overlay-background: var(--palette11);
     --mobile-email-folder-list-background: var(--palette8);
+    --mobile-menu-item-divider: var(--palette11);
 
     /* size */
     --mobile-max-size: 991px;

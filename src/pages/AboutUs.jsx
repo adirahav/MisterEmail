@@ -3,7 +3,7 @@ import React from 'react'
 export function AboutUs() {
 
     return (
-        <main className='container about'>t
+        <main className='container about'>
             <div>
                 <article className="team">
                     <h2>Our Team</h2>

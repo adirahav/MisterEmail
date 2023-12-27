@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { utilService } from '../services/util.service';
 import { emailService } from '../services/email.service';
@@ -58,7 +58,7 @@ export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, o
 
     const handleCheck = (ev) => {
         ev.stopPropagation();    
-        onCheck()
+        onCheck();
     }
 
     const handleStar = (ev) => {
@@ -83,5 +83,5 @@ export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, o
                 <i className={`${iconRead}`} onClick={handleUnread}></i>
             </span>
         </div> 
-    )
+    );
 }

@@ -9,7 +9,6 @@ export function EmailFolderList({selectedFolder, folderList, onSelectFolder, onS
     
     const handleSelectFolder = (ev, key) => {
         navigate(`/email/${key}`);
-        //onSelectFolder({ status: key });
     }
 
     if (!folderList) return <></>;
@@ -32,6 +31,6 @@ export function EmailFolderList({selectedFolder, folderList, onSelectFolder, onS
                 })}
             </ul>   
         </section>
-    )
+    );
 }
 

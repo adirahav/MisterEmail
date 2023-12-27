@@ -23,6 +23,7 @@ export const emailService = {
     createEmail,
     getDefaultEmails,
     getDefaultFilter,
+    getFilterFromParams,
     getDefaultMultyChecked,
     getDefaultSort,
     loggedinUser
@@ -223,6 +224,20 @@ function getDefaultFilter() {
         txt: '',
         read: null
     }
+}
+
+function getFilterFromParams(searchParams) {
+    const defaultFilter = getDefaultFilter()
+    const filterBy = {}
+    for (const field in defaultFilter) {
+        const fieldValue = searchParams.get(field) || defaultFilter[field];
+    
+        filterBy[field] = fieldValue === 'true' || fieldValue === 'false' 
+                            ? Boolean(fieldValue)
+                            : fieldValue;
+    }
+    
+    return filterBy
 }
 
 function getDefaultMultyChecked() {

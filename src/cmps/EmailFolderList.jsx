@@ -18,7 +18,6 @@ export function EmailFolderList({selectedFolder, folderList, onSelectFolder, onS
         <section className={sectionClass}>
             <ul className="thin1">
                 <li className="compose"><EmailComposeButton onShowComposeEmail={onShowComposeEmail} /></li>
-                <hr />
                 {Object.keys(folderList).map(key => {
                     const folder = folderList[key];
                     const liClass = selectedFolder === key ? 'selected' : '';

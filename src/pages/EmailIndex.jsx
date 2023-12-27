@@ -11,11 +11,13 @@ import { utilService } from '../services/util.service';
 
 export function EmailIndex() {
 
+    const [searchParams, setSearchParams] = useSearchParams()
+
     const [emails, setEmails] = useState(emailService.getDefaultEmails());
     const [showOverlay, setshowOverlay] = useState(!utilService.isMobile());
     const [folderList, setFolderList] = useState({});
 
-    const [filterBy, setFilterBy] = useState(emailService.getDefaultFilter());
+    const [filterBy, setFilterBy] = useState(emailService.getFilterFromParams(searchParams))
     const [sortBy, setSortBy] = useState(emailService.getDefaultSort());
     const [multyCheckedBy, setMultyCheckedBy] = useState(emailService.getDefaultMultyChecked());
     
@@ -43,7 +45,21 @@ export function EmailIndex() {
         }
     };
     
+    const buildSearchParams = () => {
+        const searchParams = {};
+
+        if (filterBy.txt) {
+            searchParams.txt = filterBy.txt;
+        }
+
+        if (filterBy.read !== null) {
+            searchParams.read = filterBy.read;
+        }
+
+        return searchParams;
+    }
     useEffect(() => {
+        setSearchParams(buildSearchParams())
         fetchEmails();
     }, [filterBy, sortBy]);
 
@@ -135,7 +151,7 @@ export function EmailIndex() {
         }
         
         if (pressedEmail.isDraft) {
-            navigate(`/email/compose/${pressedEmail.id}`);
+            navigate(`/email/${filterStatus}/compose/${pressedEmail.id}`);
         }
         else {          
             navigate(`/email/${filterStatus}/details/${pressedEmail.id}`);       
@@ -310,7 +326,7 @@ export function EmailIndex() {
             email = await emailService.createEmail();
         }
         
-        navigate(`/email/compose/${email.id}`);
+        navigate(`/email/${filterStatus}/compose/${email.id}`);
     }
 
     async function onEmailSave(email) {

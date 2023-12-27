@@ -880,6 +880,7 @@ div.email-preview:hover span.actions i.disabled:hover {
     background-color: var(--email-folder-list-compose-background);
     border-width: 0;
     align-items: center;
+    display: flex;
 }
 
 .compose-button i {

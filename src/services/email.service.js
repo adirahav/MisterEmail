@@ -1,12 +1,12 @@
-import { storageService } from './async-storage.service.js'
-import { utilService } from './util.service.js'
+import { storageService } from './async-storage.service.js';
+import { utilService } from './util.service.js';
 
-const STORAGE_KEY = 'emails'
-const DEFAULT_FOLDER = 'inbox'
-const DEFAULT_SORT_BY = 'sentAt'
-const DEFAULT_SORT_DIRECTION = 'desc'
-const DEFAULT_MULTY_CHECKED = 'unchecked'
-const DEFAULT_MULTY_FILTER = 'none'
+const STORAGE_KEY = 'emails';
+const DEFAULT_FOLDER = 'inbox';
+const DEFAULT_SORT_BY = 'sentAt';
+const DEFAULT_SORT_DIRECTION = 'desc';
+const DEFAULT_MULTY_CHECKED = 'unchecked';
+const DEFAULT_MULTY_FILTER = 'none';
 
 const loggedinUser = {
     email: 'user@appsus.com',
@@ -29,13 +29,13 @@ export const emailService = {
     loggedinUser
 }
 
-_createEmails()
+_createEmails();
 
 async function query(filterBy, sortBy) {
     // get all
-    let emails = await storageService.query(STORAGE_KEY)
+    let emails = await storageService.query(STORAGE_KEY);
     
-    const { status: filterStatus, txt: filterText, read: filterRead } = filterBy
+    const { status: filterStatus, txt: filterText, read: filterRead } = filterBy;
     const { by: sortField, direction: sortDirection } = sortBy;
 
     // filter by folder
@@ -65,38 +65,32 @@ async function query(filterBy, sortBy) {
         }
     });
 
-    const _inboxEmails = filteredEmails.inbox;
-    const _starredEmails = filteredEmails.starred;
-    const _sentEmails = filteredEmails.sent;
-    const _draftEmails = filteredEmails.draft;
-    const _deletedEmails = filteredEmails.deleted;
-    
     switch (filterStatus) {
         case "inbox":
-            emails = _inboxEmails;
+            emails = filteredEmails.inbox;
             break;
         case "starred":
-            emails = _starredEmails;
+            emails = filteredEmails.starred;
             break;
         case "sent":
-            emails = _sentEmails;
+            emails = filteredEmails.sent;
             break;    
         case "draft":
-            emails = _draftEmails;
+            emails = filteredEmails.draft;
             break;       
         case "trash":
-            emails = _deletedEmails;
+            emails = filteredEmails.deleted;
             break;         
     }
 
     // filter by search in subject
     if (filterText) {
-        emails = emails.filter(email => email.subject.includes(filterText))
+        emails = emails.filter(email => email.subject.includes(filterText));
     }
     
     // filter by read / unread
     if (filterRead !== null) {
-        emails = emails.filter(email => email.isRead === filterRead)
+        emails = emails.filter(email => email.isRead === filterRead);
     }
 
     // sort by date / txt
@@ -126,18 +120,18 @@ async function query(filterBy, sortBy) {
     
     return {
         list: emails,
-        newInboxCount: _inboxEmails.filter(email => email.isRead === false).length,
+        newInboxCount: filteredEmails.inbox.filter(email => email.isRead === false).length,
         starredCount: 0,
         sentCount: 0,
-        draftCount: _draftEmails.length,
+        draftCount: filteredEmails.draft.length,
         trashCount: 0,
     }
 }
 
 async function actionByIds(IDs, action) {
     
-    const emails = await storageService.query(STORAGE_KEY)
-    const filteredEmails = emails.filter(email => IDs.includes(email.id))
+    const emails = await storageService.query(STORAGE_KEY);
+    const filteredEmails = emails.filter(email => IDs.includes(email.id));
     
     const updatedEmails = filteredEmails.map((email) => {
         if (IDs.includes(email.id)) {
@@ -168,11 +162,11 @@ async function actionByIds(IDs, action) {
 }
 
 function getById(id) {
-    return storageService.get(STORAGE_KEY, id)
+    return storageService.get(STORAGE_KEY, id);
 }
 
 function remove(id) {
-    return storageService.remove(STORAGE_KEY, id)
+    return storageService.remove(STORAGE_KEY, id);
 }
 
 function save(emailToSave) {
@@ -200,7 +194,7 @@ function getDefaultEmails() {
 }
 
 async function createEmail() {
-    var email = { 
+    const email = { 
         subject: '', 
         body: '', 
         isRead: false, 
@@ -214,8 +208,8 @@ async function createEmail() {
         to: null 
     };
     
-    const newEmail = await storageService.post(STORAGE_KEY, email);
-    return newEmail;
+    const composedEmail = await storageService.post(STORAGE_KEY, email);
+    return composedEmail;
 }
 
 function getDefaultFilter() {
@@ -223,12 +217,12 @@ function getDefaultFilter() {
         status: DEFAULT_FOLDER,
         txt: '',
         read: null
-    }
+    };
 }
 
 function getFilterFromParams(searchParams) {
-    const defaultFilter = getDefaultFilter()
-    const filterBy = {}
+    const defaultFilter = getDefaultFilter();
+    const filterBy = {};
     for (const field in defaultFilter) {
         const fieldValue = searchParams.get(field) || defaultFilter[field];
     
@@ -237,7 +231,7 @@ function getFilterFromParams(searchParams) {
                             : fieldValue;
     }
     
-    return filterBy
+    return filterBy;
 }
 
 function getDefaultMultyChecked() {
@@ -246,18 +240,18 @@ function getDefaultMultyChecked() {
         filter: DEFAULT_MULTY_FILTER,    // all | none | read | unread | starred | unstarred
         action: null,
         showActions: false
-    }
+    };
 }
 
 function getDefaultSort() {
     return {
         by: DEFAULT_SORT_BY,
         direction: DEFAULT_SORT_DIRECTION,
-    }
+    };
 }
 
 function _createEmails() {
-    let emails = utilService.loadFromStorage(STORAGE_KEY)
+    let emails = utilService.loadFromStorage(STORAGE_KEY);
     if (!emails || !emails.length) {
         emails = [
             { id: 'e101', subject: 'ccc inbox unread not-starred', body: 'unread not-starred', isRead: false, isStarred: false, isDeleted: false, isDraft: false, createAt : 1702064110594, sentAt : 1702064110594, removedAt : null, from: 'momo@momo.com', to: 'user@appsus.com' },
@@ -270,8 +264,8 @@ function _createEmails() {
             { id: 'e108', subject: 'sent read starred', body: 'read starred', isRead: true, isStarred: true, isDeleted: false, isDraft: false, createAt : 1702064110594, sentAt : 1551133930594, removedAt : null, from: 'user@appsus.com', to: 'momo@momo.com' },
             { id: 'e109', subject: 'aaa inbox read starred', body: 'read starred', isRead: true, isStarred: true, isDeleted: false, isDraft: false, createAt : 1702064110594, sentAt : 1702126431000, removedAt : null, from: 'momo@momo.com', to: 'user@appsus.com' },
             { id: 'e110', subject: 'trash read starred', body: 'read starred', isRead: true, isStarred: true, isDeleted: true, isDraft: false, createAt : 1702064110594, sentAt : 1702126431000, removedAt : null, from: 'momo@momo.com', to: 'user@appsus.com' },
-        ]
-        utilService.saveToStorage(STORAGE_KEY, emails)
+        ];
+        utilService.saveToStorage(STORAGE_KEY, emails);
     }
 }
 

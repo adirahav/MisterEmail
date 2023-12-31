@@ -1,7 +1,9 @@
-import React from 'react'
+import React from 'react';
+import { Button } from "@mui/material";
+import { IconSizes, PenIcon } from '../assets/Icons';
 
 export function EmailComposeButton({ onShowComposeEmail }) {
     return (
-        <button className="compose-button" onClick={() => onShowComposeEmail(null)}><i className="fa-solid fa-pen"></i><div>Compose</div></button>
-    )
+        <Button variant="contained" className="compose-button" onClick={() => onShowComposeEmail(null)}><PenIcon sx={ IconSizes.Large } /><div>Compose</div></Button>
+    );
 }

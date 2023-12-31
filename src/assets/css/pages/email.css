@@ -53,10 +53,8 @@
     padding-left: 10px;
 }
 
-.email-compose header i {
-    width: 22px;
-    height: 22px;
-    margin: 0 2px;
+.email-compose header svg {
+    margin: 0;
     border-radius: 5px;
     padding: 5px;
     text-align: center;
@@ -65,7 +63,7 @@
     line-height: 1px;
 }
 
-.email-compose header i:hover {
+.email-compose header svg:hover {
     background-color: var(--email-list-icon-background-hover);
 }
 
@@ -172,9 +170,7 @@
     margin-top: 5px;
 }
 
-.email-compose .new-message .actions i {
-    width: 25px;
-    height: 25px;
+.email-compose .new-message .actions svg {
     margin-right: 0px;
     margin-left: 0px;
     border-radius: 5px;
@@ -184,7 +180,7 @@
     display: inline-grid;
 }
 
- .new-message .actions i:hover {
+ .new-message .actions svg:hover {
     background-color: var(--email-list-icon-background-hover);
 }
 
@@ -237,7 +233,7 @@
         padding-left: 0;
     }
 
-    .email-compose header i {
+    .email-compose header svg {
         margin: 0 5px;
     }
 
@@ -262,13 +258,15 @@
     padding: 10px;
 }
 
+.email-details article.body {
+    white-space: pre-line;
+}
+
 .email-details article.actions {
     padding: 10px 0;
 }
 
-.email-details article.actions i {
-    width: 36px;
-    height: 36px;
+.email-details article.actions svg {
     margin-right: 0px;
     margin-left: 0px;
     border-radius: 18px;
@@ -278,7 +276,7 @@
     display: inline-grid;
 }
 
-.email-details article.actions i:hover {
+.email-details article.actions svg:hover {
     background-color: var(--email-list-icon-background-hover);
 }
 
@@ -310,7 +308,7 @@
     margin-top: 16px
 }
 
-.email-filter form i {
+.email-filter form svg {
     margin: 10px;
 }
 
@@ -350,15 +348,26 @@
     margin: 0 5px;
     white-space: nowrap;
     cursor: default;
+    height: 24px;
 }
 
 .email-filter ul .selected {
     font-weight: bold;
 }
 
-.email-filter ul li i {
-    margin-right: 4px;
+.email-filter ul li svg {
     text-align: center;
+    color: var(--text) 
+}
+
+.email-filter ul li input {
+    bottom: 3px;
+    position: relative;
+}
+
+.email-filter ul li span {
+    bottom: 5px;
+    position: relative;
 }
 
 .email-filter ul li.drop-down.partial input[type="checkbox"]:after {
@@ -424,11 +433,11 @@
 .email-filter ul li.multy-select-actions {
     border: 0;
     border-radius: 16px;
+    display: flex;
+    height: 35px;
 }
 
-.email-filter ul li.multy-select-actions i {
-    width: 36px;
-    height: 36px;
+.email-filter ul li.multy-select-actions svg {
     margin-right: 0px;
     margin-left: 0px;
     border-radius: 18px;
@@ -438,12 +447,26 @@
     display: inline-grid;
 }
 
-.email-filter ul li.multy-select-actions i.star {
+.email-filter ul li.multy-select-actions svg.star {
     color: var(--email-starred);
 }
 
-.email-filter ul li.multy-select-actions i:hover {
+.email-filter ul li.multy-select-actions svg:hover {
     background-color: var(--email-list-icon-background-hover);
+}
+
+.email-filter ul li.filter-actions {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    bottom: 11px;
+    position: relative;
+}
+
+.email-filter ul li.filter-actions > ul {
+    padding: 0;
+    margin: 0;
 }
 
 @media screen and (max-width: 991px) { /* mobile */
@@ -451,7 +474,7 @@
         width: auto;
     }
 
-    .email-filter form i {
+    .email-filter form svg {
         margin: 11px 10px 10px 10px;
     }
 
@@ -532,7 +555,7 @@
     background-color: transparent;
 }
 
-.email-folder-list ul li i {
+.email-folder-list ul li svg {
     margin-right: 12px;
     width: 20px;
     text-align: center;
@@ -703,13 +726,13 @@ div.email-preview span.star {
     margin-right: 14px;
 }
 
-div.email-preview span.star i {
+div.email-preview span.star svg {
     margin-right: 12px;
     width: 20px;
     text-align: center;
 }
 
-div.email-preview.starred span.star i {
+div.email-preview.starred span.star svg {
     color: var(--email-starred);
 }
 
@@ -766,12 +789,10 @@ div.email-preview span.actions {
 
 div.email-preview:hover span.actions {
     display: block;
-    margin-right: 5px;
+    padding-right: 5px;
 }
 
-div.email-preview:hover span.actions i {
-    width: 36px;
-    height: 36px;
+div.email-preview:hover span.actions svg {
     margin-right: 0px;
     margin-left: 0px;
     border-radius: 18px;
@@ -781,15 +802,15 @@ div.email-preview:hover span.actions i {
     display: inline-grid;
 }
 
-div.email-preview:hover span.actions i:hover {
+div.email-preview:hover span.actions svg:hover {
     background-color: var(--email-list-icon-background-hover);
 }
 
-div.email-preview:hover span.actions i.disabled {
+div.email-preview:hover span.actions svg.disabled {
     color: var(--disabled-text);
 }
 
-div.email-preview:hover span.actions i.disabled:hover {
+div.email-preview:hover span.actions svg.disabled:hover {
     background-color: transparent;
 }
 
@@ -873,7 +894,7 @@ div.email-preview:hover span.actions i.disabled:hover {
 /* compose button             */
 /******************************/
 
-.compose-button {
+.compose-button.css-sghohy-MuiButtonBase-root-MuiButton-root {
     border-radius: 16px;
     height: 56px;
     padding: 0 24px;
@@ -881,14 +902,16 @@ div.email-preview:hover span.actions i.disabled:hover {
     border-width: 0;
     align-items: center;
     display: flex;
+    text-transform: none;
+    color: var(--text);
 }
 
 .compose-button i {
     margin-right: 0;
 }
 
-.compose-button:hover {
-    background-color: transparent;
+.compose-button.css-sghohy-MuiButtonBase-root-MuiButton-root:hover {
+    background-color: var(--email-folder-list-compose-background);
     box-shadow: 0 1px 3px 0 rgba(60,64,67,0.302), 0 4px 8px 3px rgba(60,64,67,0.149);
 }
 

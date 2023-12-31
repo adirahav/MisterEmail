@@ -1,23 +1,24 @@
-import React from 'react'
-import { useEffect, useState } from "react";
+import React from 'react';
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { EmailFolderList } from "../cmps/EmailFolderList";
 import { EmailFilter } from '../cmps/EmailFilter';
 import { EmailList } from '../cmps/EmailList';
 import { EmailComposeButton } from "../cmps/EmailComposeButton";
 import { Overlay } from '../cmps/Overlay';
+import { useEffectOnChangeURL } from '../customHooks/useEffectOnChangeURL';
 import { emailService } from '../services/email.service';
 import { utilService } from '../services/util.service';
 
 export function EmailIndex() {
 
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [emails, setEmails] = useState(emailService.getDefaultEmails());
     const [showOverlay, setshowOverlay] = useState(!utilService.isMobile());
     const [folderList, setFolderList] = useState({});
 
-    const [filterBy, setFilterBy] = useState(emailService.getFilterFromParams(searchParams))
+    const [filterBy, setFilterBy] = useState(emailService.getFilterFromParams(searchParams));
     const [sortBy, setSortBy] = useState(emailService.getDefaultSort());
     const [multyCheckedBy, setMultyCheckedBy] = useState(emailService.getDefaultMultyChecked());
     
@@ -27,8 +28,9 @@ export function EmailIndex() {
     const [showSearchOnly, setShowSearchOnly] = useState(utilService.isMobile());
     
     const navigate = useNavigate();
-    const location = useLocation();
-    const params = useParams();
+    const urlLocation = useLocation();
+    const urlParams = useParams();
+    const urlSearchParams = useRef(new URLSearchParams(urlLocation.search))
 
     // fetch emails
     const fetchEmails = async () => {
@@ -42,49 +44,47 @@ export function EmailIndex() {
 
         } catch (error) {
             console.error('Error fetching data:', error);
+            showErrorAlert({
+                message: 'An error occurred. Please try again later.',
+                closeButton: { show: false, autoClose: false }, 
+                positiveButton: { show: true, text: "OK", onPress: null, closeAfterPress: true }, 
+                negativeButton: { show: false } 
+            });
         }
     };
     
-    const buildSearchParams = () => {
-        const searchParams = {};
-
-        if (filterBy.txt) {
-            searchParams.txt = filterBy.txt;
-        }
-
-        if (filterBy.read !== null) {
-            searchParams.read = filterBy.read;
-        }
-
-        return searchParams;
-    }
+    const buildSearchParams = () => ({
+        ...(filterBy.txt && { txt: filterBy.txt }),
+        ...(filterBy.read !== null && { read: filterBy.read }),
+        ...(urlSearchParams.current.get("to") !== null && { to: urlSearchParams.current.get("to") }),
+        ...(urlSearchParams.current.get("subject") !== null && { subject: urlSearchParams.current.get("subject") }),
+    });
+    
     useEffect(() => {
-        setSearchParams(buildSearchParams())
+        setSearchParams(buildSearchParams());
         fetchEmails();
     }, [filterBy, sortBy]);
 
     useEffect(() => {
-        if (params.folder) {
-            filterBy.status = params.folder;
+        if (urlParams.folder) {
+            filterBy.status = urlParams.folder;
         }
         fetchEmails();
-    }, [params.folder]);
+    }, [urlParams.folder]);
 
-    useEffect(() => {
+    useEffectOnChangeURL(() => {
         setShowFloatingComposeButton(
-            !utilService.isMobile() 
-                ? false 
-                : window.location.hash.includes('/compose/') || window.location.hash.includes('/details/')
-                    ? false
-                    : true
+            utilService.isMobile() && !(window.location.hash.includes('/compose/') || window.location.hash.includes('/details/')) 
         );
 
-        setShowSearchOnly(window.location.hash.includes('/details/'));
+        setShowSearchOnly(
+            window.location.hash.includes('/details/')
+        );
 
         setShowEmailList(
             !window.location.hash.includes('/details/')
         );
-    }, [location]);
+    }, []);
     
     // folder list 
     function orgenizeFolderList(result) {
@@ -135,8 +135,8 @@ export function EmailIndex() {
     }
     
     function onToggleFolderList() {  
-        setShowFolderList(!showFolderList)
-        setshowOverlay(!showOverlay)
+        setShowFolderList(!showFolderList);
+        setshowOverlay(!showOverlay);
     }
 
     // details page
@@ -304,20 +304,19 @@ export function EmailIndex() {
         if (utilService.isMobile() && showFolderList) {
             onToggleFolderList();
         }
-    
-        const urlParams = new URLSearchParams(location.search)
-        if (urlParams.size === 0) {
+        
+        if (urlSearchParams.size === 0) {
             navigate(`/email/${filterBy.status}`);
         }
     }
 
-    const { status: filterStatus, txt: filterText, read: filterRead } = filterBy
+    const { status: filterStatus, txt: filterText, read: filterRead } = filterBy;
 
     // sort
     const { by: sortField, direction: sortDirection } = sortBy;
 
     function onSetSort(oredrBy) {
-        setSortBy(prevSort => ({ ...prevSort, ...oredrBy }))
+        setSortBy(prevSort => ({ ...prevSort, ...oredrBy }));
     }
 
     // compose
@@ -351,7 +350,7 @@ export function EmailIndex() {
         {showOverlay && <Overlay onPress={onToggleFolderList} />}
 
         <aside>
-            <EmailFolderList selectedFolder={filterStatus} folderList={folderList} onSelectFolder={onSetFilter} onShowComposeEmail={onShowComposeEmail} showFolderList={showFolderList} />
+            <EmailFolderList selectedFolder={filterStatus} folderList={folderList} onShowComposeEmail={onShowComposeEmail} showFolderList={showFolderList} />
         </aside>
         <main>
             <EmailFilter showSearchOnly={showSearchOnly} filterBy={filterBy} onSetFilter={onSetFilter} sortBy={{sortField, sortDirection}} onSetSort={onSetSort} multyCheckedBy={multyCheckedBy} onSetMultyChecked={onSetMultyChecked} onMobileToggleFolderList={onToggleFolderList} />        
@@ -359,5 +358,5 @@ export function EmailIndex() {
             <Outlet context={{ onDelete: onEmailDelete, onAutoSave: onEmailSave, onSend: onEmailSend}} />
         </main> 
         {showFloatingComposeButton && <EmailComposeButton onShowComposeEmail={onShowComposeEmail} />}
-    </>)
+    </>);
 }

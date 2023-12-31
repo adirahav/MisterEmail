@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react"
-import { eventBusService } from "../services/event-bus.service"
+import { useEffect, useState } from "react";
+import { eventBusService } from "../services/event-bus.service";
+import { Button } from "@mui/material";
+import { IconSizes, SuccessIcon, ErrorIcon, WarningIcon, MessageIcon, CloseIcon} from '../assets/Icons';
 
-window.showSuccessAlert = showSuccessAlert
-window.showWarningAlert = showWarningAlert
-window.showErrorAlert = showErrorAlert
-window.showMessageAlert = showMessageAlert
+window.showSuccessAlert = showSuccessAlert;
+window.showWarningAlert = showWarningAlert;
+window.showErrorAlert = showErrorAlert;
+window.showMessageAlert = showMessageAlert;
 
 export function Alert() {
 
@@ -27,7 +29,7 @@ export function Alert() {
                 
                 if (_closeButton && _closeButton.autoClose) {
                     setTimeout(() => {
-                        onClose()
+                        onClose();
                     }, _closeButton.autoCloseSeconds * 1000);
                 }
     
@@ -37,16 +39,16 @@ export function Alert() {
             setDisplayAlert(true);
         })
 
-        return unsubscribe
-    }, [type, message, positiveButton, negativeButton, closeButton])
+        return unsubscribe;
+    }, [type, message, positiveButton, negativeButton, closeButton]);
 
     function onClose() {
-        setType(null)
-        setMessage(null)
-        setPositiveButton(null)
-        setNegativeButton(null)
-        setCloseButton(null)
-        setDisplayAlert(false)
+        setType(null);
+        setMessage(null);
+        setPositiveButton(null);
+        setNegativeButton(null);
+        setCloseButton(null);
+        setDisplayAlert(false);
     }
 
     function handleButton(button) {
@@ -67,10 +69,10 @@ export function Alert() {
 
     function getHeader() {  
         switch (type) {
-            case "error":     return <><div><i className="fa-solid fa-triangle-exclamation"></i><h2>Error</h2></div></>;
-            case "warning":   return <><div><i className="fa-solid fa-bell"></i><h2>Warning</h2></div></>;
-            case "success":   return <><div><i className="fa-solid fa-circle-check"></i><h2>Success</h2></div></>;
-            case "message":   return <><div><i className="fa-solid fa-comment-dots"></i><h2>Message</h2></div></>;
+            case "error":     return <><div><ErrorIcon sx={ IconSizes.Medium } /><h2>Error</h2></div></>;
+            case "warning":   return <><div><WarningIcon sx={ IconSizes.Medium } /><h2>Warning</h2></div></>;
+            case "success":   return <><div><SuccessIcon sx={ IconSizes.Medium } /><h2>Success</h2></div></>;
+            case "message":   return <><div><MessageIcon sx={ IconSizes.Medium } /><h2>Message</h2></div></>;
             default: <></>
         }
     }
@@ -79,17 +81,17 @@ export function Alert() {
         <div className={"alert " + type}>
             <header>
                 {getHeader()}
-                {closeButton.show && <i className="fa-solid fa-xmark" onClick={onClose}></i>}
+                {closeButton.show && <CloseIcon sx={ IconSizes.Small } onClick={onClose} />}
             </header>
             <section className="message">
-                <p>{message}</p>
+                <p>{message.replace(/<br\s*\/?>/g, '\n')}</p>
             </section>
             <section className="buttons">
-                {positiveButton.show && <button className='positive' onClick={() => handleButton(positiveButton)}>{positiveButton.text}</button>}
-                {negativeButton.show && <button className='negative' onClick={() => handleButton(negativeButton)}>{negativeButton.text}</button>}
+                {positiveButton.show && <Button variant="contained" className='positive' onClick={() => handleButton(positiveButton)}>{positiveButton.text}</Button>}
+                {negativeButton.show && <Button variant="contained" className='negative' onClick={() => handleButton(negativeButton)}>{negativeButton.text}</Button>}
             </section>
         </div>
-    )
+    );
 }
 
 function showAlert(data) {

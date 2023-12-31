@@ -1,14 +1,15 @@
-import { Route, HashRouter as Router, Routes, useLocation } from 'react-router-dom'
-import { useEffect, useState } from "react";
+import { Route, HashRouter as Router, Routes } from 'react-router-dom';
+import { useState } from "react";
 import { AppHeader } from './cmps/AppHeader';
 import { AppFooter } from './cmps/AppFooter';
+import { useEffectOnChangeURL } from './customHooks/useEffectOnChangeURL';
 import { HomePage } from './pages/HomePage';
 import { AboutUs } from './pages/AboutUs';
 import { EmailIndex } from './pages/EmailIndex';
 import { EmailDetails } from './cmps/EmailDetails';
 import { EmailCompose } from './cmps/EmailCompose';
-import { EmailFolderList } from './cmps/EmailFolderList';
 import { Alert } from './cmps/Alert';
+import 'animate.css';
 
 export function App() {
 
@@ -16,8 +17,6 @@ export function App() {
     const [hasAside, setAdside] = useState([false]);
     const [pageClass, setPageClass] = useState(["home-index"]);
     
-    const location = useLocation();
-
     const setLayout = async () => {
         const currentPath = window.location.hash;
         setHeaderAndFooter(!currentPath.includes('#/email'));
@@ -29,11 +28,11 @@ export function App() {
                         : "home-index");
     };
 
-    const mainSectionClass = `main-app ${pageClass}${hasAside ? ' has-aside' : ''}`
+    const mainSectionClass = `main-app ${pageClass}${hasAside ? ' has-aside' : ''}`;
 
-    useEffect(() => {
+    useEffectOnChangeURL(() => {
         setLayout();
-    }, [location]);
+    }, []);
 
     return (     
         <section className={mainSectionClass}>
@@ -53,6 +52,6 @@ export function App() {
             <Alert />
             {hasHeaderAndFooter && <AppFooter />}
         </section>
-    )
+    );
 }
 

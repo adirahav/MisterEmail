@@ -1,39 +1,45 @@
-import React from 'react'
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import React from 'react';
+import { useState, useEffect, useRef } from "react";
+import { useParams, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { utilService } from '../services/util.service';
 import { emailService } from "../services/email.service";
+import { Button } from "@mui/material";
+import { IconSizes, ArrowLeftIcon, SendIcon, FullscreenIcon, FullscreenExitIcon, MinimizeIcon, MaximizeIcon, CloseIcon, TrashIcon, MapMarkerIcon, AddLocationIcon } from '../assets/Icons';
 
 export function EmailCompose() {
-    const location = useLocation();
+    const urlLocation = useLocation();
 
-    const { onAutoSave, onSend, onDelete } = useOutletContext()
+    const { onAutoSave, onSend, onDelete } = useOutletContext();
     const [draftEmail, setDraftEmail] = useState(null);
-    const [header, setHeader] = useState('')
+    const [header, setHeader] = useState('');
     const [lastDraftEmail, setLastDraftEmail] = useState(null);
     const [autoSaveInterval, setAutoSaveInterval] = useState(null);
-    const [resize, setResize] = useState('maximize');
-    const [fullscreen, setFullscreen] = useState('not-fullscreen');
-    const [urlParams, setURLParams] = useSearchParams(new URLSearchParams(location.search))
+    const [isMaximize, setIsMaximize] = useState(true);
+    const [isFullscreen, setIsFullscreen] = useState(false);
     
-    const params = useParams();
+    const refBody = useRef();
+
+    const urlParams = useParams();
     const navigate = useNavigate();
     const AUTO_SAVE_TIME = 5 * 1000;    // 5 seconds in milliseconds
+
+    const urlSearchParams = useRef(new URLSearchParams(urlLocation.search))
 
     // load email
     useEffect(() => {
         loadEmail();
-    }, [params.emailId])
+    }, [urlParams.emailId])
 
     async function loadEmail() {
-        try {   
-            const email = params.emailId
-                            ? await emailService.getById(params.emailId)
+        
+        try {
+            const email = urlParams.emailId
+                            ? await emailService.getById(urlParams.emailId)
                             : await getParamsFromURL();
             
-            setDraftEmail(email)
+            setDraftEmail(email);
         } catch (err) {
-            navigate('/email')
+            navigate('/email');
             console.log('Had issues loading email', err);
         }
     }
@@ -42,10 +48,10 @@ export function EmailCompose() {
         const email = await emailService.createEmail();
         
         for (const field in email) {
-            email[field] = urlParams.get(field) || email[field];
+            email[field] = urlSearchParams.current.get(field) || email[field];
         }
         
-        return email
+        return email;
     }
 
     // header
@@ -110,18 +116,24 @@ export function EmailCompose() {
     }
     
     // send
-    const handleSend = () => {
+    const handleSend = (ev) => {
         function sendEmail() {
             onSend(draftEmail);
             handleClose();
         }
+        
+        ev.preventDefault();
+        ev.stopPropagation();
 
         if (utilService.hasValidEmail(draftEmail.to)) {
-            if (!subject && !body) {
-                const result = window.confirm("`Send this message without a subject or text in the body?`");
-                if (result) {
-                    sendEmail();
-                }
+            
+            if (!subject.subject && !subject.body) {
+                showWarningAlert({
+                    message: 'Send this message without a subject or text in the body?',
+                    closeButton: { show: true, autoClose: false }, 
+                    positiveButton: { show: true, text: "OK", onPress: () => { sendEmail() }, closeAfterPress: true }, 
+                    negativeButton: { show: true, text: "Cancel", onPress: null, closeAfterPress: true }, 
+                });
             }
             else {
                 sendEmail();
@@ -145,50 +157,94 @@ export function EmailCompose() {
 
     // resize
     function windowResize() {
-        setResize((prevResize) => {
-            return prevResize == "minimize"
-                    ? "maximize" 
-                    : "minimize";
-        }); 
+        setIsMaximize(!isMaximize); 
     }
 
-    const resizeClass = `fa-solid fa-window-${resize == 'minimize' ? 'maximize' : 'minimize'} fa-xs`;
+    const resizeClass = isMaximize ? 'maximize' : 'minimize';
+
+    function DynamicResizeIcon(props) {    
+        return props.maximize == "true"
+            ? <MaximizeIcon {...props} />
+            : <MinimizeIcon {...props} />;
+    }
 
     // fullscreen
     function windowFullscreen() {
-        setFullscreen((prevFullscreen) => {
-            if (prevFullscreen == "fullscreen") {
-                return "not-fullscreen";
+        setIsFullscreen((prevIsFullscreen) => {
+            if (!isFullscreen && !isMaximize) {
+                setIsMaximize(true)
             }
-            else {
-                setResize("maximize");
-                return "fullscreen";
-            }
+            return !prevIsFullscreen;
         }); 
     }
 
-    const fullscreenClass = `fa-solid ${fullscreen == 'fullscreen' ?  'fa-solid fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center'} fa-xs`;
+    const fullscreenClass = isFullscreen ? 'fullscreen' : '';
+
+    function DynamicFullscreenIcon(props) {    
+        return props.fullscreen == "true"
+            ? <FullscreenIcon {...props} />
+            : <FullscreenExitIcon {...props} />;
+    }
+
+    // map
+    const handleAddUsertLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                const coords = `{ lat: ${latitude}, lng: ${longitude} }`;
+                
+                const cursorPos = refBody.current.selectionStart;
+                const currentValue = refBody.current.value;
+                const newValue = currentValue.substring(0, cursorPos) 
+                                + coords.toString() 
+                                + currentValue.substring(cursorPos);
+                refBody.current.value = newValue;
+                refBody.current.setSelectionRange(cursorPos + coords.length, cursorPos + coords.length);
+                
+                setDraftEmail({...draftEmail, body: newValue});
+            },
+            (error) => {
+                showErrorAlert({
+                    message: `Error getting user location: <br /> ${error.message}`,
+                    closeButton: { show: false, autoClose: false }, 
+                    positiveButton: { show: true, text: "OK", onPress: null, closeAfterPress: true }, 
+                    negativeButton: { show: false } 
+                });
+            }
+            );
+        } 
+        else {
+            showWarningAlert({
+                message: `Geolocation is not supported by this browser.`,
+                closeButton: { show: false, autoClose: false }, 
+                positiveButton: { show: true, text: "OK", onPress: null, closeAfterPress: true }, 
+                negativeButton: { show: false } 
+            });
+        }
+    };
 
     if (!draftEmail) return <></>;
-
+    
     return (
-        <article className={`email-compose ${resize} ${fullscreen}`}>
+        <section className={`email-compose ${resizeClass} ${fullscreenClass}`}>
             <header className="web">
                 <h2>{header}</h2>
                 <div>
-                    <i className={resizeClass} onClick={windowResize}></i>
-                    <i className={fullscreenClass} onClick={windowFullscreen}></i>
-                    <i className="fa-solid fa-xmark" onClick={handleClose}></i>
+                    <DynamicResizeIcon maximize={isMaximize.toString()} onClick={windowResize} sx={ IconSizes.Large } />
+                    <DynamicFullscreenIcon fullscreen={isFullscreen.toString()} onClick={windowFullscreen} sx={ IconSizes.Large } />
+                    <CloseIcon onClick={handleClose} sx={ IconSizes.Large } />
                 </div>
             </header>
             <header className="mobile">
-                <h2><i className="fa-solid fa-arrow-left" onClick={handleClose}></i></h2>
+                <h2><ArrowLeftIcon onClick={handleClose} sx={ IconSizes.Large } /></h2>
                 <div>
-                    <i className="fa-regular fa-paper-plane" onClick={handleSend}></i>
-                    <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
+                    <SendIcon onClick={handleSend} sx={ IconSizes.Large } />
+                    <AddLocationIcon onClick={handleAddUsertLocation} sx={ IconSizes.Large } />
+                    <TrashIcon onClick={handleDelete} sx={ IconSizes.Large } />
                 </div>
             </header>
-            <div className="new-message">
+            <form className="new-message" onSubmit={handleSend}>
                 <div className='recipients'>
                     <input
                         type="text"
@@ -213,12 +269,20 @@ export function EmailCompose() {
                         id="body"
                         name="body"
                         value={draftEmail.body ?? ''}
-                        onChange={handleFieldChanged} />
+                        onChange={handleFieldChanged}
+                        ref={refBody}>
+                </textarea>
+
+                
                 <div className='actions'>
-                    <button className='send' onClick={handleSend}>Send</button>
-                    <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
+                    <Button type="submit" variant="contained" className='send'>Send</Button>
+                    <article>
+                        <AddLocationIcon onClick={handleAddUsertLocation} sx={ IconSizes.Large } />
+                        <TrashIcon onClick={handleDelete} sx={ IconSizes.Large } />
+                    </article>
                 </div>
-            </div>
-        </article>
-    )
+            </form>
+        </section>
+        
+    );
 }

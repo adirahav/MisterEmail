@@ -1,5 +1,3 @@
-
-
 export const utilService = {
     makeId,
     saveToStorage,
@@ -9,14 +7,15 @@ export const utilService = {
     areObjectsEqual,
     hasValidEmail,
     isMobile,
-    getDummyColor
+    getDummyColor,
+    animateCSS
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function makeId(length = 5) {
     var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
@@ -28,7 +27,7 @@ function saveToStorage(key, value) {
 }
 
 function loadFromStorage(key, defaultValue = null) {
-    var value = localStorage[key] || defaultValue;
+    const value = localStorage[key] || defaultValue;
     return JSON.parse(value);
 }
 
@@ -119,3 +118,20 @@ function getDummyColor() {
     const blue = randomComponent();
     return `rgb(${red},${green},${blue})`;
 };
+
+function animateCSS(el, animation, isRemoveClass = true) {
+
+    const prefix = 'animate__'
+    return new Promise((resolve, reject) => {
+        const animationName = `${prefix}${animation}`
+        el.classList.add(`${prefix}animated`, animationName)
+
+        function handleAnimationEnd(event) {
+            event.stopPropagation()
+            if (isRemoveClass) el.classList.remove(`${prefix}animated`, animationName)
+            resolve('Animation ended')
+        }
+
+        el.addEventListener('animationend', handleAnimationEnd, { once: true })
+    })
+}

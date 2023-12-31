@@ -2,11 +2,13 @@ import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { utilService } from '../services/util.service';
 import { emailService } from '../services/email.service';
+import { IconSizes, TrashIcon, ReadIcon, UnreadIcon, StarIcon, ArchiveIcon } from '../assets/Icons';
+
 
 export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, onDelete, onUnread}) {
 
     const navigate = useNavigate();
-
+   
     useEffect(() => {
         const handlePopstate = () => {
             navigate(`/email`);
@@ -17,6 +19,8 @@ export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, o
         return () => {
             window.removeEventListener('popstate', handlePopstate);
         };
+
+        
     }, []);
 
     function handleDelete(ev) {
@@ -52,10 +56,6 @@ export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, o
                     ? email.createAt
                     : email.sentAt;
 
-    const iconRead = email.isRead 
-                    ? 'fa-solid fa-envelope-circle-check' 
-                    : 'fa-regular fa-envelope-open';
-
     const handleCheck = (ev) => {
         ev.stopPropagation();    
         onCheck();
@@ -66,10 +66,16 @@ export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, o
         onStar(email);
     }
 
+    function DynamicReadIcon(props) {
+        return props.read == "true"
+            ? <UnreadIcon {...props} />
+            : <ReadIcon {...props} />;
+    }
+
     return (
         <div className={trClass} onClick={() => onPress(email)}>
             <span className="checkbox"><input type="checkbox" onClick={handleCheck} /></span>
-            <span className="star"><i className="fa-regular fa-star" onClick={handleStar}></i></span>
+            <span className="star"><StarIcon onClick={handleStar} sx={ IconSizes.Large } /></span>
             <span className="avatar" style={{ background: avatarColor }}>{avatar}</span>
             <span className="email">{email.from}</span>
             <span className="draft">Draft</span>
@@ -78,9 +84,9 @@ export function EmailPreview({selectedFolder, email, onPress, onCheck, onStar, o
             <span className="body">{email.body}</span>
             <span className="date">{utilService.formatListDate(date)}</span>
             <span className="actions">
-                <i className={`fa-solid fa-arrow-up-from-bracket ${iconDisabledClass}`}></i>
-                <i className="fa-regular fa-trash-can" onClick={handleDelete}></i>
-                <i className={`${iconRead}`} onClick={handleUnread}></i>
+                <ArchiveIcon className={iconDisabledClass} sx={ IconSizes.Large } />
+                <TrashIcon onClick={handleDelete} sx={ IconSizes.Large } />
+                <DynamicReadIcon read={email.isRead.toString()} onClick={handleUnread} sx={ IconSizes.Large } />
             </span>
         </div> 
     );

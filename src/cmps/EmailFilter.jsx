@@ -1,7 +1,10 @@
-import React from 'react'
-import { useEffect, useState } from "react";
+import React from 'react';
+import { useEffect, useState, useRef } from "react";
 import { utilService } from '../services/util.service';
 import { emailService } from '../services/email.service';
+import { useEffectOnChange } from '../customHooks/useEffectOnChange';
+import { useForm } from '../customHooks/useForm'
+import { IconSizes, SearchIcon, MenuIcon, TrashIcon, ReadIcon, UnreadIcon, StarIcon, ArrowDownIcon, ArrowUpIcon } from '../assets/Icons';
 
 export function EmailFilter({
     showSearchOnly,
@@ -9,8 +12,14 @@ export function EmailFilter({
     filterBy, onSetFilter, 
     multyCheckedBy, onSetMultyChecked, 
     onMobileToggleFolderList }) {
-    const [displayReadFilterDropDown, setDisplayReadFilterDropdown] = useState('none')
-    const [displayMultyFilterDropdown, setDisplayMultyFilterDropdown] = useState("none")
+    
+    const [displayReadFilterDropDown, setDisplayReadFilterDropdown] = useState('none');
+    const [displayMultyFilterDropdown, setDisplayMultyFilterDropdown] = useState("none");
+    const [displayMultySelectActions, setDisplayMultySelectActions] = useState(multyCheckedBy.showActions ? 'flex' : 'none');
+    const [displayFilterActions, setDisplayFilterActions] = useState(!multyCheckedBy.showActions ? 'flex' : 'none');
+    
+    const refMultySelectActions = useRef();
+    const refFilterActions = useRef();
 
     // filter - search
     const handleSearchChange = (ev) => {
@@ -38,12 +47,12 @@ export function EmailFilter({
     }
 
     function toggleRead() {
-        setDisplayReadFilterDropdown(displayReadFilterDropDown === "none" ? "block" : "none")
+        setDisplayReadFilterDropdown(displayReadFilterDropDown === "none" ? "block" : "none");
     }
 
     useEffect(() => {
-        setDisplayReadFilterDropdown(displayReadFilterDropDown)
-    }, [displayReadFilterDropDown])
+        setDisplayReadFilterDropdown(displayReadFilterDropDown);
+    }, [displayReadFilterDropDown]);
 
     
     // sort
@@ -64,7 +73,7 @@ export function EmailFilter({
         onSetMultyChecked({ ...multyCheckedBy, filter: multyFilterField }); 
     }
 
-    const handleMultyActionChange = (ev) => {
+    const handleMultyActionPress = (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
@@ -75,7 +84,7 @@ export function EmailFilter({
     }
 
     function toggleMultyFilterDropdown() {
-        setDisplayMultyFilterDropdown(displayMultyFilterDropdown === "none" ? "block" : "none")
+        setDisplayMultyFilterDropdown(displayMultyFilterDropdown === "none" ? "block" : "none");
     }
 
     const handleMultyCheckboxChange = (ev) => {
@@ -88,26 +97,25 @@ export function EmailFilter({
     }
 
     useEffect(() => {
-        setDisplayMultyFilterDropdown(displayMultyFilterDropdown)
-    }, [displayMultyFilterDropdown])
+        setDisplayMultyFilterDropdown(displayMultyFilterDropdown);
+    }, [displayMultyFilterDropdown]);
 
     
     // render content
-    const { txt } = filterBy
+    const { txt } = filterBy;
 
     const dateSort = {
         liSelected: sortBy.sortField === "sentAt" ? "selected" : "",
-        icon: "fa-solid fa-chevron-" + (sortBy.sortField === "sentAt" && sortBy.sortDirection === "asc" ? "up" : "down") + " fa-xs"
+        direction: sortBy.sortField === "sentAt" && sortBy.sortDirection === "asc" ? "up" : "down"
     }
     
     const subjectSort = {
         liSelected: sortBy.sortField === "subject" ? "selected" : "",
-        icon: "fa-solid fa-chevron-" + (sortBy.sortField === "subject" && sortBy.sortDirection === "asc" ? "up" : "down") + " fa-xs"    
+        direction: sortBy.sortField === "subject" && sortBy.sortDirection === "asc" ? "up" : "down"    
     }
     
     const readFilter =  {
         liClass: "drop-down" + (filterBy.read !== null ? " selected" : ""),
-        icon: "fa-solid fa-chevron-down fa-xs",
         text: filterBy.read === null 
                 ? "All" 
                 : filterBy.read === true 
@@ -122,7 +130,6 @@ export function EmailFilter({
     const multySelect = {
         liClass: "drop-down " + multyCheckedBy.checked,
         checked: multyCheckedBy.checked == "checked" ? multyCheckedBy.checked : "",
-        icon: "fa-solid fa-chevron-down fa-xs",
         displayUL: { display: displayMultyFilterDropdown },
         all: multyCheckedBy.filter === "all" ? "selected" : "", 
         none: multyCheckedBy.filter === "none" ? "selected" : "", 
@@ -137,17 +144,47 @@ export function EmailFilter({
         color: utilService.getDummyColor()
     }
     
+    // multy-actions/filter-actions animation
+    useEffectOnChange(async () => {
+        if (multyCheckedBy.showActions) {
+            setDisplayMultySelectActions('flex');
+            await utilService.animateCSS(refMultySelectActions.current, 'fadeInLeft');
+            utilService.animateCSS(refFilterActions.current, 'backOutRight');
+            setTimeout(() => {
+                setDisplayFilterActions('none');
+            }, 500);  
+        }
+        else {
+            utilService.animateCSS(refMultySelectActions.current, 'fadeOutLeft');
+            setTimeout(() => {
+                setDisplayMultySelectActions('none');
+                setDisplayFilterActions('flex');
+                utilService.animateCSS(refFilterActions.current, 'fadeIn');
+            }, 500);
+        }
+    }, [multyCheckedBy.showActions]); 
+
+    function DynamicArrowIcon(props) {
+        switch (props.direction) {
+            case 'up':
+                return <ArrowUpIcon {...props} />
+            case 'down':
+                return <ArrowDownIcon {...props} />
+            default:
+                return <></>
+        }
+    }
 
     return (
         <article className="email-filter">
             <form>
-                <i className="fa-solid fa-magnifying-glass web"></i>
-                <i className="fa-solid fa-bars mobile" onClick={onMobileToggleFolderList}></i>
+                <SearchIcon className="web" fontSize="medium" />
+                <MenuIcon className="mobile" onClick={onMobileToggleFolderList} fontSize="medium" />
                 <input type="text" placeholder="Search" onChange={handleSearchChange} id="search" value={txt} name="subject" />
                 <span className="avatar mobile" style={{ background: avatar.color }}>{avatar.letter}</span>
             </form>
             {!showSearchOnly && <ul>
-                <li className={multySelect.liClass}><i className={multySelect.icon} onClick={toggleMultyFilterDropdown} ></i><input checked={multySelect.checked} type="checkbox" onChange={handleMultyCheckboxChange} />
+                <li className={multySelect.liClass} onClick={toggleMultyFilterDropdown}><ArrowDownIcon fontSize="small" /><input checked={multySelect.checked} type="checkbox" onChange={handleMultyCheckboxChange} />
                     <ul style={multySelect.displayUL}>
                         <li className={multySelect.all} onClick={handleMultyFilterChange} data-multy-filter-field="all">All</li>
                         <li className={multySelect.none} onClick={handleMultyFilterChange} data-multy-filter-field="none">None</li>
@@ -157,24 +194,28 @@ export function EmailFilter({
                         <li className={multySelect.unstarred} onClick={handleMultyFilterChange} data-multy-filter-field="unstarred">Unstarred</li>
                     </ul>
                 </li>
-                {multyCheckedBy.showActions && <li className="multy-select-actions">
-                    <i className="fa-regular fa-trash-can" onClick={handleMultyActionChange} data-multy-action-field="delete"></i>
-                    <i className="fa-regular fa-envelope-open" onClick={handleMultyActionChange} data-multy-action-field="read"></i>
-                    <i className="fa-solid fa-envelope-circle-check" onClick={handleMultyActionChange} data-multy-action-field="unread"></i>
-                    <i className="fa-regular fa-star star" onClick={handleMultyActionChange} data-multy-action-field="starred"></i>
-                    <i className="fa-regular fa-star" onClick={handleMultyActionChange} data-multy-action-field="unstarred"></i>
-                </li>}
+                <li style={{display: displayMultySelectActions}} className="multy-select-actions" ref={refMultySelectActions}>
+                    <TrashIcon onClick={handleMultyActionPress} data-multy-action-field="delete" sx={ IconSizes.Large } />
+                    <ReadIcon onClick={handleMultyActionPress} data-multy-action-field="read" sx={ IconSizes.Large } />
+                    <UnreadIcon onClick={handleMultyActionPress} data-multy-action-field="unread" sx={ IconSizes.Large } />
+                    <StarIcon onClick={handleMultyActionPress} data-multy-action-field="starred" sx={ IconSizes.Large } className="star" />
+                    <StarIcon onClick={handleMultyActionPress} data-multy-action-field="unstarred" sx={ IconSizes.Large } />
+                </li>
                 
-                {!showSearchOnly && <li className={dateSort.liSelected} onClick={handleSortBy} data-sort-field="sentAt"><i className={dateSort.icon}></i>Date</li>}
-                {!showSearchOnly && <li className={subjectSort.liSelected} onClick={handleSortBy} data-sort-field="subject"><i className={subjectSort.icon}></i>Subject</li>}
-                {!showSearchOnly && <li className={readFilter.liClass}><i className={readFilter.icon} onClick={toggleRead} ></i>{readFilter.text}
-                    <ul style={readFilter.displayUL}>
-                        <li className={readFilter.all} onClick={handleFilterChange} data-read-field="null">All</li>
-                        <li className={readFilter.read} onClick={handleFilterChange} data-read-field="true">Read</li>
-                        <li className={readFilter.unread} onClick={handleFilterChange} data-read-field="false">Unread</li>
+                <li style={{display: displayFilterActions}} className="filter-actions" ref={refFilterActions}>
+                    <ul>
+                        <li className={dateSort.liSelected} onClick={handleSortBy} data-sort-field="sentAt"><DynamicArrowIcon direction={dateSort.direction} fontSize="small" /><span>Date</span></li>
+                        <li className={subjectSort.liSelected} onClick={handleSortBy} data-sort-field="subject"><DynamicArrowIcon direction={subjectSort.direction} fontSize="small" /><span>Subject</span></li>
+                        <li className={readFilter.liClass} onClick={toggleRead}><ArrowDownIcon fontSize="small" /><span>{readFilter.text}</span>
+                            <ul style={readFilter.displayUL}>
+                                <li className={readFilter.all} onClick={handleFilterChange} data-read-field="null">All</li>
+                                <li className={readFilter.read} onClick={handleFilterChange} data-read-field="true">Read</li>
+                                <li className={readFilter.unread} onClick={handleFilterChange} data-read-field="false">Unread</li>
+                            </ul>
+                        </li>
                     </ul>
-                </li>}
+                </li>
             </ul>}    
         </article>
-    )
+    );
 }

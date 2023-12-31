@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export function AboutUs() {
 
@@ -23,5 +23,5 @@ export function AboutUs() {
                 </article>    
             </div>   
         </main>
-    )
+    );
 }

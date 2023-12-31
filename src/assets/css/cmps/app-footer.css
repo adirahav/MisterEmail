@@ -15,7 +15,7 @@ footer a {
     border-top: 1px sold var(--footer-help-border);
     border-left: 1px sold var(--footer-help-border);
     border-right: 1px sold var(--footer-help-border);
-    color: var(--footer-add-new-text);
+    color: var(--footer-help-text);
     padding: 15px;
     border-radius: 20px 20px 0 0;
     font-size: 20px;
@@ -24,8 +24,10 @@ footer a {
     width: 150px;
 }
 
-footer i {
+footer svg {
     margin-right: 5px;
+    top: 4px;
+    position: relative;
 }
 
 footer a:hover {

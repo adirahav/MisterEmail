@@ -1,0 +1,100 @@
+{
+  "hash": "95e29bb8",
+  "configHash": "db5ec38a",
+  "lockfileHash": "c1f2776b",
+  "browserHash": "c64d2087",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "01d859dc",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "bdd48458",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "e728ad00",
+      "needsInterop": false
+    },
+    "@mui/material": {
+      "src": "../../node_modules/@mui/material/index.js",
+      "file": "@mui_material.js",
+      "fileHash": "65d054ab",
+      "needsInterop": false
+    },
+    "react-tooltip": {
+      "src": "../../node_modules/react-tooltip/dist/react-tooltip.min.mjs",
+      "file": "react-tooltip.js",
+      "fileHash": "d7151d63",
+      "needsInterop": false
+    },
+    "formik": {
+      "src": "../../node_modules/formik/dist/formik.esm.js",
+      "file": "formik.js",
+      "fileHash": "3c758ad1",
+      "needsInterop": false
+    },
+    "yup": {
+      "src": "../../node_modules/yup/index.esm.js",
+      "file": "yup.js",
+      "fileHash": "90ec617c",
+      "needsInterop": false
+    },
+    "google-map-react": {
+      "src": "../../node_modules/google-map-react/dist/index.modern.js",
+      "file": "google-map-react.js",
+      "fileHash": "47624b08",
+      "needsInterop": false
+    },
+    "@mui/icons-material": {
+      "src": "../../node_modules/@mui/icons-material/esm/index.js",
+      "file": "@mui_icons-material.js",
+      "fileHash": "61db1c62",
+      "needsInterop": false
+    },
+    "chart.js": {
+      "src": "../../node_modules/chart.js/dist/chart.js",
+      "file": "chart__js.js",
+      "fileHash": "99b917ad",
+      "needsInterop": false
+    },
+    "react-chartjs-2": {
+      "src": "../../node_modules/react-chartjs-2/dist/index.js",
+      "file": "react-chartjs-2.js",
+      "fileHash": "e9703eae",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-UOH5BHIQ": {
+      "file": "chunk-UOH5BHIQ.js"
+    },
+    "chunk-5RBN6XF3": {
+      "file": "chunk-5RBN6XF3.js"
+    },
+    "chunk-ZTOO6GNK": {
+      "file": "chunk-ZTOO6GNK.js"
+    },
+    "chunk-FSOZ7EOK": {
+      "file": "chunk-FSOZ7EOK.js"
+    },
+    "chunk-IP2RRMVG": {
+      "file": "chunk-IP2RRMVG.js"
+    },
+    "chunk-DXOUNB47": {
+      "file": "chunk-DXOUNB47.js"
+    },
+    "chunk-JBG67EE7": {
+      "file": "chunk-JBG67EE7.js"
+    },
+    "chunk-UV5CTPV7": {
+      "file": "chunk-UV5CTPV7.js"
+    }
+  }
+}

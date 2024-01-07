@@ -58,5 +58,21 @@
     .statistics {
         grid-area: s;
     }
+
+
+    @media screen and (max-width: 991px) { /* mobile */
+        div {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "t"
+                "f"
+                "g"
+                "s";
+
+            article {
+                margin-bottom: 20px;
+            }
+        }
+    }
 }
 

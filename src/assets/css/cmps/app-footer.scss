@@ -25,6 +25,10 @@ footer {
         &:hover {
             text-decoration: none;
         }
+
+        span {
+            margin-left: 5px;
+        }
     }
     
     svg {
@@ -96,6 +100,48 @@ footer {
                     background-color: var(--button-opposite-background);
                     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
                 
+                }
+            }
+        }
+    }
+
+
+    @media screen and (max-width: 991px) { /* mobile */
+        a.help-button {
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background-color: transparent;
+            
+            span {
+                display: none;
+            }
+
+            svg {
+                margin: 0;
+                color: var(--footer-help-background);
+                background: transparent;
+                border-radius: 30px;
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        div.help-form {
+            top: calc(50% - 10px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 1236px;
+            width: calc(100% - 40px);
+            height: calc(100% - 120px);
+            margin: 20px auto;
+            border-radius: 20px;
+
+            form {
+                input {
+                    width: 100%;
                 }
             }
         }

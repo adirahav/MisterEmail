@@ -33,11 +33,18 @@ export function AppFooter() {
 
     const handleDisplayHelp = async () => {
         if (showHelpForm) {
-            utilService.animateCSS(refHelpForm.current, 'backOutDown');
-            setTimeout(() => {
+            if (!utilService.isMobile()) {
+                utilService.animateCSS(refHelpForm.current, 'backOutDown');
+                setTimeout(() => {
+                    setShowHelpForm(false);
+                    setShowHelpButton(true);
+                }, 500);  
+            }
+            else {
                 setShowHelpForm(false);
                 setShowHelpButton(true);
-            }, 500);  
+            }
+
         }
         else {
             setShowHelpButton(false);
@@ -56,7 +63,7 @@ export function AppFooter() {
         <footer className="app-footer">
             <p>&copy; 2023 Mister Email. All rights reserved.</p>
             {/*<Link className="help-button" to={{ pathname: '/email/inbox/compose', search: ',?to=help@gmail.com&subject=Help' }}><HelpIcon sx={ IconSizes.Medium } /> Help</Link>*/}
-            <Link className={buttpmClass} onClick={handleDisplayHelp} ref={refHelpButton}><HelpIcon sx={ IconSizes.Medium } /> Help</Link>
+            <Link className={buttpmClass} onClick={handleDisplayHelp} ref={refHelpButton}><HelpIcon sx={ IconSizes.Medium } /><span>Help</span></Link>
             <div className={formClass} ref={refHelpForm}>
                 <header>
                     <HelpIcon sx={ IconSizes.Medium } />

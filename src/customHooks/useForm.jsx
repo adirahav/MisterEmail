@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useEffectOnChange } from "./useEffectOnChange";
 
-export function useForm(initialState, cb) {
+export function useForm(initialState, callback) {
     const [fields, setFields] = useState(initialState)
 
     useEffectOnChange(() => {
-        cb(fields)
+        callback(fields)
     }, [fields])
 
     function handleChange({ target }) {
@@ -23,5 +23,5 @@ export function useForm(initialState, cb) {
         setFields((prevFields) => ({ ...prevFields, [field]: value }))
     }
 
-    return [fields, handleChange, setFields]
+    return [fields, handleChange/*, setFields*/]
 }

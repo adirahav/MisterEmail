@@ -1,17 +1,17 @@
 /*  Basics */
-@import "basics/base.css";
-@import "basics/helpers.css";
-@import "basics/layout.css";
-@import "basics/animations.css";
+@import "basics/base.scss";
+@import "basics/helpers.scss";
+@import "basics/layout.scss";
+@import "basics/animations.scss";
 
 /* Pages */
-@import "./pages/home.css";
-@import "./pages/about.css";
-@import "./pages/email.css";
+@import "./pages/home.scss";
+@import "./pages/about.scss";
+@import "./pages/email.scss";
 
 /* Components */
-@import "./cmps/app-header.css";
-@import "./cmps/app-footer.css";
+@import "./cmps/app-header.scss";
+@import "./cmps/app-footer.scss";
 
 
 :root {
@@ -60,11 +60,14 @@
     --button-positive-background: var(--palette6);
     --button-negative: var(--palette16);
     --button-negative-background: var(--palette10);
+    --button-opposite: var(--palette6);
+    --button-opposite-background: var(--palette16);
     --email-folder-list-item-divider: var(--palette10);
     --email-folder-list-item-background-hover: var(--palette9);
     --email-folder-list-item-background-selected: var(--palette4);
     --email-folder-list-compose-background: var(--palette5);
     --email-search-background: var(--palette7);
+    --email-actions-background: var(--palette4);
     --email-filter-background: var(--palette16);
     --email-filter-border: var(--palette10);
     --email-filter-read-border: var(--palette10);
@@ -85,6 +88,8 @@
     --mobile-background: var(--palette16);
     --mobile-email-preview-background: var(--palette16);
     --mobile-email-preview-background-hover: var(--palette16);
+    --mobile-email-preview-background-pressing: var(--palette9);
+    --mobile-email-preview-background-selected: var(--palette4);
     --mobile-email-compose-background-header: var(--palette16);
     --mobile-overlay-background: var(--palette11);
     --mobile-email-folder-list-background: var(--palette8);

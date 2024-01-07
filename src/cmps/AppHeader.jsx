@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Overlay } from '../cmps/Overlay';
 import { useEffectOnChangeURL } from '../customHooks/useEffectOnChangeURL';
 import { utilService } from '../services/util.service';
+import { IconSizes, MenuIcon } from '../assets/Icons';
 
 export function AppHeader() {
   const [showOverlay, setshowOverlay] = useState(!utilService.isMobile());
@@ -32,15 +33,15 @@ export function AppHeader() {
 
       <header>
         <section>
-          <i className="fa-solid fa-bars mobile" onClick={onToggleMenu}></i>
-            <div>
-            <img src="src/assets/imgs/icon.png" />
+          <MenuIcon className="mobile" onClick={onToggleMenu} sx={ IconSizes.Medium } />
+          <div>
+            <img src="/MisterEmail/src/assets/imgs/icon.png" />
             <h1>Mister Email</h1>
           </div>
           <nav style={{display:`${displayNav}`}}>
             <ul>
               <li className="mobile">
-                <img src="src/assets/imgs/icon.png" />
+                <img src="/MisterEmail/src/assets/imgs/icon.png" />
                 <h1>Mister Email</h1>
               </li>
               <hr className="mobile" />

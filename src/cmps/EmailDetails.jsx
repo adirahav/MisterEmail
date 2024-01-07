@@ -33,7 +33,7 @@ export function EmailDetails() {
     };
 
     // delete
-    function handleDelete() {
+    const handleDelete = () => {
         onDelete(email, true);
     }
 

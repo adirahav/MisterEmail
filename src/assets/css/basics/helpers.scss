@@ -5,50 +5,52 @@
     margin: 0;
     padding: 0;
     list-style-type: none;
+
+    &>li {
+        margin: 0;
+        padding: 0;
+    }
 }
 
-.clean-list>li {
-    margin: 0;
-    padding: 0;
-}
+
 
 /* Positioning */
 .flex {
     display: flex;
-}
 
-.flex>*.full-grow {
-    flex: 1;
-}
-
-
-.flex.column {
-    flex-direction: column;
-}
-
-.flex.justify-center {
-    justify-content: center;
-}
-
-.flex.align-center {
-    align-items: center;
-}
-
-.flex.wrap {
-    flex-wrap: wrap;
-}
-
-.flex.space-between {
-    justify-content: space-between;
-}
-
-.flex.space-around {
-    justify-content: space-around;
-}
-
-.flex.auto-center {
-    justify-content: center;
-    align-items: center;
+    &>*.full-grow {
+        flex: 1;
+    }
+    
+    
+    &.column {
+        flex-direction: column;
+    }
+    
+    &.justify-center {
+        justify-content: center;
+    }
+    
+    &.align-center {
+        align-items: center;
+    }
+    
+    &.wrap {
+        flex-wrap: wrap;
+    }
+    
+    &.space-between {
+        justify-content: space-between;
+    }
+    
+    &.space-around {
+        justify-content: space-around;
+    }
+    
+    &.auto-center {
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .text-center {
@@ -80,18 +82,14 @@
     padding: 0;
     cursor: pointer;
 
+    &:disabled {
+        cursor: initial;
+        opacity: 0.2;
+    }
 
-}
-
-.simple-button:disabled {
-    cursor: initial;
-    opacity: 0.2;
-}
-
-
-
-.simple-button:hover:not(:disabled) {
-    opacity: 1;
+    &:hover:not(:disabled) {
+        opacity: 1;
+    }
 }
 
 
@@ -166,12 +164,10 @@
         margin-bottom: 10px;
     }
 
-
-}
-
-.simple-form :is(input:not([type="checkbox"]), button) {
-    padding: 5px 8px;
-    width: 100%;
+    &:is(input:not([type="checkbox"]), button) {
+        padding: 5px 8px;
+        width: 100%;
+    }
 }
 
 .form-errors {

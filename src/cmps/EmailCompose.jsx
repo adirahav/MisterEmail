@@ -5,6 +5,7 @@ import { utilService } from '../services/util.service';
 import { emailService } from "../services/email.service";
 import { Button } from "@mui/material";
 import { IconSizes, ArrowLeftIcon, SendIcon, FullscreenIcon, FullscreenExitIcon, MinimizeIcon, MaximizeIcon, CloseIcon, TrashIcon, MapMarkerIcon, AddLocationIcon } from '../assets/Icons';
+import { Tooltip } from 'react-tooltip';
 
 export function EmailCompose() {
     const urlLocation = useLocation();
@@ -16,7 +17,6 @@ export function EmailCompose() {
     const [autoSaveInterval, setAutoSaveInterval] = useState(null);
     const [isMaximize, setIsMaximize] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    
     const refBody = useRef();
 
     const urlParams = useParams();
@@ -112,6 +112,12 @@ export function EmailCompose() {
     // close
     const handleClose = () => {
         //navigate(-1);
+
+        setDraftEmail((prevDraftEmail) => {
+            onAutoSave(prevDraftEmail);
+            return prevDraftEmail; 
+        });
+
         navigate(`/email`);
     }
     
@@ -127,7 +133,7 @@ export function EmailCompose() {
 
         if (utilService.hasValidEmail(draftEmail.to)) {
             
-            if (!subject.subject && !subject.body) {
+            if (!draftEmail.subject && !draftEmail.body) {
                 showWarningAlert({
                     message: 'Send this message without a subject or text in the body?',
                     closeButton: { show: true, autoClose: false }, 
@@ -199,6 +205,7 @@ export function EmailCompose() {
                 const newValue = currentValue.substring(0, cursorPos) 
                                 + coords.toString() 
                                 + currentValue.substring(cursorPos);
+
                 refBody.current.value = newValue;
                 refBody.current.setSelectionRange(cursorPos + coords.length, cursorPos + coords.length);
                 
@@ -224,6 +231,9 @@ export function EmailCompose() {
         }
     };
 
+    const tooltipResize = isMaximize ? "Minimize" : "Maximize";
+    const tooltipFullscreen = isFullscreen ? "Exit full screen" : "Full screen";
+
     if (!draftEmail) return <></>;
     
     return (
@@ -231,9 +241,9 @@ export function EmailCompose() {
             <header className="web">
                 <h2>{header}</h2>
                 <div>
-                    <DynamicResizeIcon maximize={isMaximize.toString()} onClick={windowResize} sx={ IconSizes.Large } />
-                    <DynamicFullscreenIcon fullscreen={isFullscreen.toString()} onClick={windowFullscreen} sx={ IconSizes.Large } />
-                    <CloseIcon onClick={handleClose} sx={ IconSizes.Large } />
+                    <DynamicResizeIcon maximize={isMaximize.toString()} onClick={windowResize} sx={ IconSizes.Large } data-tooltip-id="tooltip-resize" data-tooltip-content={tooltipResize} /><Tooltip id="tooltip-resize" place="bottom" />
+                    <DynamicFullscreenIcon fullscreen={isFullscreen.toString()} onClick={windowFullscreen} sx={ IconSizes.Large } data-tooltip-id="tooltip-fullscreen" data-tooltip-content={tooltipFullscreen} /><Tooltip id="tooltip-fullscreen" place="bottom" />
+                    <CloseIcon onClick={handleClose} sx={ IconSizes.Large } data-tooltip-id="tooltip-close" data-tooltip-content="Save & close" /><Tooltip id="tooltip-close" place="bottom" />
                 </div>
             </header>
             <header className="mobile">
@@ -277,8 +287,10 @@ export function EmailCompose() {
                 <div className='actions'>
                     <Button type="submit" variant="contained" className='send'>Send</Button>
                     <article>
-                        <AddLocationIcon onClick={handleAddUsertLocation} sx={ IconSizes.Large } />
-                        <TrashIcon onClick={handleDelete} sx={ IconSizes.Large } />
+                        <div>
+                            <AddLocationIcon onClick={handleAddUsertLocation} sx={ IconSizes.Large } data-tooltip-id="tooltip-coords" data-tooltip-content="Add your location" /><Tooltip id="tooltip-coords" place="left" />
+                            <TrashIcon onClick={handleDelete} sx={ IconSizes.Large } data-tooltip-id="tooltip-delete" data-tooltip-content="Delete" /><Tooltip id="tooltip-delete" place="top" />
+                        </div>
                     </article>
                 </div>
             </form>

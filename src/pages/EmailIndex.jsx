@@ -2,6 +2,8 @@ import React from 'react';
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { EmailFolderList } from "../cmps/EmailFolderList";
+import { EmailLogo } from '../cmps/EmailLogo';
+import { EmailSearch } from '../cmps/EmailSearch';
 import { EmailFilter } from '../cmps/EmailFilter';
 import { EmailList } from '../cmps/EmailList';
 import { EmailComposeButton } from "../cmps/EmailComposeButton";
@@ -10,14 +12,13 @@ import { useEffectOnChangeURL } from '../customHooks/useEffectOnChangeURL';
 import { emailService } from '../services/email.service';
 import { utilService } from '../services/util.service';
 
-export function EmailIndex() {
-
+export function EmailIndex({ onToggleMenu }) {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [emails, setEmails] = useState(emailService.getDefaultEmails());
     const [showOverlay, setshowOverlay] = useState(!utilService.isMobile());
     const [folderList, setFolderList] = useState({});
-
+    
     const [filterBy, setFilterBy] = useState(emailService.getFilterFromParams(searchParams));
     const [sortBy, setSortBy] = useState(emailService.getDefaultSort());
     const [multyCheckedBy, setMultyCheckedBy] = useState(emailService.getDefaultMultyChecked());
@@ -25,7 +26,7 @@ export function EmailIndex() {
     const [showEmailList, setShowEmailList] = useState(true);
     const [showFolderList, setShowFolderList] = useState(!utilService.isMobile());
     const [showFloatingComposeButton, setShowFloatingComposeButton] = useState(utilService.isMobile());
-    const [showSearchOnly, setShowSearchOnly] = useState(utilService.isMobile());
+    const [showFilter, setShowFilter] = useState(utilService.isMobile());
     
     const navigate = useNavigate();
     const urlLocation = useLocation();
@@ -77,8 +78,8 @@ export function EmailIndex() {
             utilService.isMobile() && !(window.location.hash.includes('/compose/') || window.location.hash.includes('/details/')) 
         );
 
-        setShowSearchOnly(
-            window.location.hash.includes('/details/')
+        setShowFilter(
+            !window.location.hash.includes('/details/')
         );
 
         setShowEmailList(
@@ -134,9 +135,12 @@ export function EmailIndex() {
 
     }
     
-    function onToggleFolderList() {  
-        setShowFolderList(!showFolderList);
-        setshowOverlay(!showOverlay);
+    function onToggleMenu() {
+        if (utilService.isMobile()) {
+            setShowFolderList(!showFolderList);
+            setshowOverlay(!showOverlay);
+        }  
+        
     }
 
     // details page
@@ -160,7 +164,6 @@ export function EmailIndex() {
 
     // multy check / uncheck
     function onEmailCheck() {
-
         setMultyCheckedBy((prevMultyChecked) => {
             return { ...prevMultyChecked, 
                 filter: null, 
@@ -232,9 +235,25 @@ export function EmailIndex() {
     }
 
     function shouldShowMultyActions() {
-        const checkedCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]:checked');
-        const showActions = checkedCheckboxes.length > 0;
-        return showActions;
+        if (!utilService.isMobile()) {
+            const checkedCheckboxes = document.querySelectorAll('.email-list input[type="checkbox"]:checked');
+            const showActions = checkedCheckboxes.length > 0;
+            return showActions;
+        }
+        else {
+            const checkedRows = document.querySelectorAll('.email-list .selected');
+            const showActions = checkedRows.length > 0;
+
+            setMultyCheckedBy((prevMultyCheckedBy) => {
+                return {
+                    ...prevMultyCheckedBy, 
+                    showActions: showActions,
+                    counter: checkedRows.length
+                };
+            });
+            
+            return showActions;
+        }
     }
 
     function shouldCheckMultyCheckbox() {
@@ -302,7 +321,7 @@ export function EmailIndex() {
         setFilterBy(filterBy);
 
         if (utilService.isMobile() && showFolderList) {
-            onToggleFolderList();
+            onToggleMenu();
         }
         
         if (urlSearchParams.size === 0) {
@@ -313,8 +332,6 @@ export function EmailIndex() {
     const { status: filterStatus, txt: filterText, read: filterRead } = filterBy;
 
     // sort
-    const { by: sortField, direction: sortDirection } = sortBy;
-
     function onSetSort(oredrBy) {
         setSortBy(prevSort => ({ ...prevSort, ...oredrBy }));
     }
@@ -347,14 +364,18 @@ export function EmailIndex() {
     }
 
     return ( <>
-        {showOverlay && <Overlay onPress={onToggleFolderList} />}
+        {showOverlay && <Overlay onPress={onToggleMenu} />}
 
+        <header>
+            <EmailLogo onToggleMenu={onToggleMenu} />           
+            <EmailSearch filterBy={filterBy} onSetFilter={onSetFilter} multyCheckedBy={multyCheckedBy} onSetMultyChecked={onSetMultyChecked} onToggleMenu={onToggleMenu} />          
+        </header>
         <aside>
             <EmailFolderList selectedFolder={filterStatus} folderList={folderList} onShowComposeEmail={onShowComposeEmail} showFolderList={showFolderList} />
         </aside>
         <main>
-            <EmailFilter showSearchOnly={showSearchOnly} filterBy={filterBy} onSetFilter={onSetFilter} sortBy={{sortField, sortDirection}} onSetSort={onSetSort} multyCheckedBy={multyCheckedBy} onSetMultyChecked={onSetMultyChecked} onMobileToggleFolderList={onToggleFolderList} />        
-            {showEmailList && <EmailList selectedFolder={filterStatus} emails={emails.list} onPress={onEmailPress} onCheck={onEmailCheck} onStar={onEmailStar} onDelete={onEmailDelete} onUnread={onEmailUnread} />}  
+            {showFilter && <EmailFilter filterBy={filterBy} onSetFilter={onSetFilter} sortBy={sortBy} onSetSort={onSetSort} multyCheckedBy={multyCheckedBy} onSetMultyChecked={onSetMultyChecked} />}        
+            {showEmailList && <EmailList selectedFolder={filterStatus} emails={emails.list} onPress={onEmailPress} onCheck={onEmailCheck} onStar={onEmailStar} onDelete={onEmailDelete} onUnread={onEmailUnread} /> }  
             <Outlet context={{ onDelete: onEmailDelete, onAutoSave: onEmailSave, onSend: onEmailSend}} />
         </main> 
         {showFloatingComposeButton && <EmailComposeButton onShowComposeEmail={onShowComposeEmail} />}

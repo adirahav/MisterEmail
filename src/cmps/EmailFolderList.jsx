@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { EmailComposeButton } from "./EmailComposeButton";
 import { IconSizes, InboxIcon, StarIcon, SentIcon, DraftIcon, TrashIcon } from '../assets/Icons';
+import { Tooltip } from 'react-tooltip';
 
 export function EmailFolderList({selectedFolder, folderList, onShowComposeEmail, showFolderList}) {
     
@@ -33,17 +34,18 @@ export function EmailFolderList({selectedFolder, folderList, onShowComposeEmail,
 
     return (
         <section className={sectionClass}>
-            <ul className="thin1">
+            <ul>
                 <li className="compose"><EmailComposeButton onShowComposeEmail={onShowComposeEmail} /></li>
                 {Object.keys(folderList).map(key => {
                     const folder = folderList[key];
                     const liClass = selectedFolder === key ? 'selected' : '';
-                    
+                    const tooltipID = `tooltip-${key}`; 
+
                     return (
-                        <li key={key} className={liClass} onClick={(ev) => handleSelectFolder(ev, key)}>
-                            <DynamicFolderIcon folder={key} sx={ IconSizes.Large } />
+                        <li key={key} className={liClass} onClick={(ev) => handleSelectFolder(ev, key)} data-tooltip-id={tooltipID}  data-tooltip-content={folder.label}>
+                            <DynamicFolderIcon folder={key} sx={IconSizes.Large}  />
                             <div>{folder.label}</div>
-                            <div className="new-count">{folder.count > 0 ? folder.count : ''}</div>
+                            <div className="new-count">{folder.count > 0 ? folder.count : ''}</div><Tooltip id={tooltipID} place="right" />
                         </li>
                     );
                 })}

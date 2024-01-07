@@ -26,6 +26,7 @@ export const emailService = {
     getFilterFromParams,
     getDefaultMultyChecked,
     getDefaultSort,
+    getStatistics,
     loggedinUser
 }
 
@@ -239,7 +240,8 @@ function getDefaultMultyChecked() {
         checked: DEFAULT_MULTY_CHECKED,  // checked | unchecked | partial
         filter: DEFAULT_MULTY_FILTER,    // all | none | read | unread | starred | unstarred
         action: null,
-        showActions: false
+        showActions: false,
+        counter: 0
     };
 }
 
@@ -248,6 +250,45 @@ function getDefaultSort() {
         by: DEFAULT_SORT_BY,
         direction: DEFAULT_SORT_DIRECTION,
     };
+}
+
+async function getStatistics() {
+    // get all
+    let emails = await storageService.query(STORAGE_KEY);
+    
+    const filteredEmails = {
+        inbox: [],
+        starred: [],
+        sent: [],
+        draft: [],
+        deleted: [],
+    };
+
+    emails.forEach(email => {
+        if (email.to === emailService.loggedinUser.email && !email.isDeleted && !email.isDraft) {
+            filteredEmails.inbox.push(email);
+        }
+        if (email.isStarred && !email.isDeleted && !email.isDraft) {
+            filteredEmails.starred.push(email);
+        }
+        if (email.from === emailService.loggedinUser.email && !email.isDeleted && !email.isDraft) {
+            filteredEmails.sent.push(email);
+        }
+        if (!email.isDeleted && email.isDraft) {
+            filteredEmails.draft.push(email);
+        }
+        if (email.isDeleted) {
+            filteredEmails.deleted.push(email);
+        }
+    });
+
+    return [
+        {key: 'inbox', value: filteredEmails.inbox.length},
+        {key: 'starred', value: filteredEmails.starred.length},
+        {key: 'sent', value: filteredEmails.sent.length},
+        {key: 'draft', value: filteredEmails.draft.length},
+        {key: 'deleted', value: filteredEmails.deleted.length}
+    ]
 }
 
 function _createEmails() {
